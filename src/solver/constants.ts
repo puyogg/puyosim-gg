@@ -8,7 +8,23 @@ enum PUYOTYPE {
   PURPLE,
   HARD,
   BLOCK,
+  STONE,
 }
+
+type PuyoNameMapper = { [P in PUYOTYPE]: string };
+
+const PUYONAME: PuyoNameMapper = [
+  'spacer',
+  'garbage',
+  'red',
+  'green',
+  'blue',
+  'yellow',
+  'purple',
+  'hard',
+  'block',
+  'stone',
+];
 
 const CHAIN_POWER = {
   TSU: [0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672],
@@ -46,4 +62,4 @@ const DEFAULT_SETTINGS: SolverSettings = {
   targetPoint: 70,
 };
 
-export { PUYOTYPE, SolverSettings, DEFAULT_SETTINGS };
+export { PUYOTYPE, PUYONAME, SolverSettings, DEFAULT_SETTINGS };

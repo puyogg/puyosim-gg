@@ -1,11 +1,11 @@
 import { StateContainer } from './container';
-import { Field, FieldSettings } from './field';
+import { LayerSettings, PuyoLayer } from './layer';
 import { ASSET_PATH } from './constants';
 import { Sprite } from 'pixi.js';
 
 /** The field frame, along with the character background */
 class Frame extends StateContainer {
-  private puyoField: Field;
+  public puyoLayer: PuyoLayer;
 
   constructor(parent: StateContainer) {
     super(parent);
@@ -13,20 +13,21 @@ class Frame extends StateContainer {
     this.initCharBG();
     this.initBorders();
 
-    // Lay out the Puyo Field
+    // Lay out the Puyo Layer
     const puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
-    const fieldSettings: FieldSettings = {
-      rows: this.state.dimensions.rows,
-      hrows: this.state.dimensions.hrows,
-      cols: this.state.dimensions.cols,
+    const fieldSettings: LayerSettings = {
+      rows: this.state.simSettings.rows,
+      hrows: this.state.simSettings.hrows,
+      cols: this.state.simSettings.cols,
       cellWidth: this.state.pxSizing.cellWidth,
       cellHeight: this.state.pxSizing.cellHeight,
     };
 
-    this.puyoField = new Field(fieldSettings, puyoTextures);
-    this.puyoField.x = 24;
-    this.puyoField.y = -8;
-    this.addChild(this.puyoField);
+    this.puyoLayer = new PuyoLayer(fieldSettings, puyoTextures);
+    this.addChild(this.puyoLayer); // Needs to be a child to receive root state data.
+    this.puyoLayer.refreshSprites(this.state.slides[0].puyo);
+    this.puyoLayer.x = 25;
+    this.puyoLayer.y = -8;
   }
 
   public update(delta: number): void {
@@ -43,7 +44,7 @@ class Frame extends StateContainer {
   }
 
   private initBorders(): void {
-    const fieldTextures = this.resources[`${ASSET_PATH}/field.json`].textures as PIXI.ITextureDictionary;
+    const fieldTextures = this.resources[`${ASSET_PATH}/layout.json`].textures as PIXI.ITextureDictionary;
     const borderTop = new Sprite(fieldTextures['field_border_top.png']);
     borderTop.x = 0;
     borderTop.y = 0;

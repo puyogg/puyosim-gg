@@ -80,14 +80,24 @@ class ChainSolver {
       let toDrop = 0;
       for (let r = this.rows - 1; r >= 0; r--) {
         const puyo = puyoField.get(r, c);
-        if (isColored(puyo) || isGarbage(puyo)) {
-          dropDists.set(r, c, toDrop);
-          if (toDrop > 0) state.hasDrops = true;
-        } else if (isBlock(puyo)) {
+        // if (isColored(puyo) || isGarbage(puyo)) {
+        //   dropDists.set(r, c, toDrop);
+        //   if (toDrop > 0) state.hasDrops = true;
+        // } else if (isBlock(puyo)) {
+        //   dropDists.set(r, c, 0);
+        //   toDrop = 0;
+        // } else {
+        //   toDrop += 1;
+        // }
+
+        if (isBlock(puyo)) {
           dropDists.set(r, c, 0);
           toDrop = 0;
-        } else {
+        } else if (puyo === PUYOTYPE.NONE) {
           toDrop += 1;
+        } else {
+          dropDists.set(r, c, toDrop);
+          if (toDrop > 0) state.hasDrops = true;
         }
       }
     }
@@ -189,7 +199,6 @@ class ChainSolver {
         // Add group data if it means the pop requirement
         if (group.length >= this.puyoToPop) {
           posToPop.push(...group);
-          console.log(group);
           for (const g of group) {
             const { row, col } = g;
             isPopping.set(row, col, true);
@@ -235,7 +244,6 @@ class ChainSolver {
     state.CB = this.colorBonus[colors.size - 1];
     state.CP = this.chainPower[Math.min(state.chainLength - 1, this.chainPower.length - 1)];
     state.score += 10 * state.PC + Math.min(Math.max(state.GB + state.CB + state.CP, 1), 999);
-    console.log(sizes, state.GB);
     state.garbage = Math.floor(state.score / this.targetPoint); // Not gonna bother with leftover NP
   }
 
@@ -297,6 +305,66 @@ class ChainSolver {
       this.applyPops();
       return this.simulate();
     }
+  }
+
+  public resetToEmpty(): void {
+    this.states = [
+      {
+        puyoField: new PuyoField(this.rows, this.cols),
+        dropDists: new NumField(this.rows, this.cols),
+        garbageAdjacency: new NumField(this.rows, this.cols),
+        isPopping: new BoolField(this.rows, this.cols),
+        hasDrops: false,
+        hasPops: false,
+        chainLength: 0,
+        score: 0,
+        PC: 0,
+        GB: 0,
+        CB: 0,
+        CP: 0,
+        garbage: 0,
+      },
+    ];
+  }
+
+  public resetToInput(): void {
+    this.states = [
+      {
+        puyoField: this.inputField,
+        dropDists: new NumField(this.rows, this.cols),
+        garbageAdjacency: new NumField(this.rows, this.cols),
+        isPopping: new BoolField(this.rows, this.cols),
+        hasDrops: false,
+        hasPops: false,
+        chainLength: 0,
+        score: 0,
+        PC: 0,
+        GB: 0,
+        CB: 0,
+        CP: 0,
+        garbage: 0,
+      },
+    ];
+  }
+
+  public resetToField(field: PuyoField): void {
+    this.states = [
+      {
+        puyoField: field,
+        dropDists: new NumField(this.rows, this.cols),
+        garbageAdjacency: new NumField(this.rows, this.cols),
+        isPopping: new BoolField(this.rows, this.cols),
+        hasDrops: false,
+        hasPops: false,
+        chainLength: 0,
+        score: 0,
+        PC: 0,
+        GB: 0,
+        CB: 0,
+        CP: 0,
+        garbage: 0,
+      },
+    ];
   }
 
   public logStates(): void {
