@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { Canvas } from './canvas';
+import { Game } from './game';
 
-const App: React.FunctionComponent = () => <Canvas />;
+const App: React.FunctionComponent = () => <Game />;
 
 render(<App />, document.getElementById('root'));
