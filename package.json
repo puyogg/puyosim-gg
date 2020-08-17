@@ -4,7 +4,7 @@
     "build": "parcel build public/index.html --no-source-maps",
     "prebuild": "run-s clean",
     "lint": "run-s lint:code",
-    "lint:code": "eslint --ext ts,tsx src",
+    "lint:code": "eslint --ext ts,tsx src --fix",
     "start": "parcel public/index.html --open"
   },
   "devDependencies": {
