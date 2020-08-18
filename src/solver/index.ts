@@ -16,6 +16,7 @@ interface FieldState {
   CB: number; // Color Bonus
   CP: number; // Chain Power
   garbage: number;
+  poppingGroups: Pos[][];
 }
 
 interface Pos {
@@ -65,6 +66,7 @@ class ChainSolver {
         CB: 0,
         CP: 0,
         garbage: 0,
+        poppingGroups: [],
       },
     ];
   }
@@ -135,6 +137,7 @@ class ChainSolver {
       CB: 0,
       CP: 0,
       garbage: state.garbage,
+      poppingGroups: [],
     };
 
     // Add state to list
@@ -153,6 +156,7 @@ class ChainSolver {
     const colors = new Set<PUYOTYPE>();
     const sizes: number[] = [];
     const posToPop: Pos[] = [];
+    const poppingGroups: Pos[][] = [];
 
     // Search for connected components
     for (let r = 0; r < this.rows; r++) {
@@ -199,6 +203,7 @@ class ChainSolver {
         // Add group data if it means the pop requirement
         if (group.length >= this.puyoToPop) {
           posToPop.push(...group);
+          poppingGroups.push(group);
           for (const g of group) {
             const { row, col } = g;
             isPopping.set(row, col, true);
@@ -236,6 +241,7 @@ class ChainSolver {
 
     // Update hasPops
     state.hasPops = posToPop.length > 0;
+    state.poppingGroups = poppingGroups;
 
     // Might as well calculate bonuses while we're here.
     state.chainLength++;
@@ -286,6 +292,7 @@ class ChainSolver {
       CB: 0,
       CP: 0,
       garbage: state.garbage,
+      poppingGroups: [],
     };
 
     // Add state to list
@@ -323,6 +330,7 @@ class ChainSolver {
         CB: 0,
         CP: 0,
         garbage: 0,
+        poppingGroups: [],
       },
     ];
   }
@@ -343,6 +351,7 @@ class ChainSolver {
         CB: 0,
         CP: 0,
         garbage: 0,
+        poppingGroups: [],
       },
     ];
   }
@@ -363,6 +372,7 @@ class ChainSolver {
         CB: 0,
         CP: 0,
         garbage: 0,
+        poppingGroups: [],
       },
     ];
   }
@@ -375,4 +385,4 @@ class ChainSolver {
   }
 }
 
-export { ChainSolver, FieldState };
+export { ChainSolver, FieldState, Pos };

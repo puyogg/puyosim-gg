@@ -59,6 +59,14 @@ class BoolField extends Field<boolean> {
   public anyFalse(): boolean {
     return this.data.some((v) => !v);
   }
+
+  public allTrue(): boolean {
+    return this.data.every((v) => v);
+  }
+
+  public allFalse(): boolean {
+    return this.data.every((v) => !v);
+  }
 }
 
 class NumField extends Field<number> {

@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { StateContainer } from './container';
 import { PositionMatrix } from './position';
-import { PUYONAME } from '../solver/constants';
+import { PUYONAME, PUYOTYPE } from '../solver/constants';
 import { isColored, isBlock, isNone } from '../solver/helper';
 import { NumField, PuyoField, BoolField } from '../solver/field';
 import { FieldState } from '../solver';
@@ -67,12 +67,13 @@ abstract class Layer extends StateContainer {
 }
 
 class PuyoLayer extends Layer {
+  private startingField: PuyoField;
   private dropDists: NumField;
   private toPop: BoolField;
   private connectivity: NumField;
   private targetY: NumField;
-  private startingField: PuyoField;
   private dropAnimationTickers: NumField;
+  private dropFinishDelay: number;
   private popAnimationTicker: number;
   public tempField: PuyoField;
 
@@ -87,6 +88,7 @@ class PuyoLayer extends Layer {
     this.tempField = new PuyoField(fieldSettings.rows, fieldSettings.cols);
     this.dropAnimationTickers = new NumField(fieldSettings.rows, fieldSettings.cols);
     this.popAnimationTicker = 0;
+    this.dropFinishDelay = 0;
 
     // Set interaction handlers
     this.setEventHandlers();
@@ -111,6 +113,7 @@ class PuyoLayer extends Layer {
         sprite.y = this.cellPos.get(r, c).y;
         this.connectivity.set(r, c, 0);
         sprite.alpha = 1;
+        sprite.visible = true;
 
         // If the cell isn't a Puyo, or is empty, just have to set its type + _0.png
         if (!isColored(puyo)) {
@@ -208,6 +211,7 @@ class PuyoLayer extends Layer {
 
     // 4. Reset Tickers
     this.dropAnimationTickers.reset();
+    this.dropFinishDelay = 0;
   }
 
   public animateChainDrops(delta: number): boolean {
@@ -304,22 +308,27 @@ class PuyoLayer extends Layer {
 
           this.dropDists.set(r, c, 0);
           this.dropAnimationTickers.increment(r, c);
+          continue;
         }
       }
     }
 
     if (this.dropDists.isAllZero()) {
-      this.refreshSprites(this.tempField);
-      return true;
+      // Delay the end of the animation a little so there's time to see the full connection.
+      if (this.dropFinishDelay === 0) {
+        this.refreshSprites(this.tempField);
+      }
+
+      if (this.dropFinishDelay >= 3) {
+        return true;
+      }
+
+      this.dropFinishDelay += 1;
     }
     return false;
   }
 
   public prepAnimatePops(fieldState: FieldState): void {
-    // Undo connectivity for Puyos that are going to pop
-    const rows = this.state.simSettings.rows;
-    const cols = this.state.simSettings.cols;
-
     this.toPop.copyFrom(fieldState.isPopping);
     this.tempField.copyFrom(fieldState.puyoField);
     this.popAnimationTicker = 0;
@@ -328,9 +337,21 @@ class PuyoLayer extends Layer {
   public animateChainPops(): boolean {
     // Do stuff
 
-    if (this.popAnimationTicker < 30) {
+    if (this.popAnimationTicker < 60) {
       this.popAnimationTicker += 1;
     } else {
+      for (let r = 0; r < this.rows; r++) {
+        for (let c = 0; c < this.cols; c++) {
+          if (this.toPop.get(r, c)) {
+            this.tempField.set(r, c, 0);
+          }
+        }
+      }
+      this.refreshSprites(this.tempField);
+      return true;
+    }
+
+    if (this.popAnimationTicker > 60) {
       for (let r = 0; r < this.rows; r++) {
         for (let c = 0; c < this.cols; c++) {
           if (this.toPop.get(r, c)) {
