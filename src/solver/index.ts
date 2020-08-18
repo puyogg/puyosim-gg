@@ -375,4 +375,4 @@ class ChainSolver {
   }
 }
 
-export { ChainSolver };
+export { ChainSolver, FieldState };

@@ -3,7 +3,8 @@ import { AppState, LoadableSlideData } from './state';
 import { StateContainer } from './container';
 import { ASSET_PATH } from './constants';
 import { Frame } from './frame';
-import { PuyoField } from '~/solver/field';
+import { PuyoField } from '../solver/field';
+import { FieldState } from '../solver';
 
 /** Subset of options available at https://pixijs.download/v5.3.3/docs/PIXI.Application.html */
 interface PixiOptions {
@@ -70,11 +71,11 @@ class Chainsim {
       })
       .onComplete.add(() => {
         this.simLoaded = true;
-        this.app.ticker.add((delta: number) => this.gameLoop(delta));
+        // this.app.ticker.add((delta: number) => this.gameLoop(delta));
 
-        // setInterval(() => {
-        //   this.gameLoop(1);
-        // }, 200);
+        setInterval(() => {
+          this.gameLoop(1);
+        }, 30);
       });
 
     // Add components that this instance of Chainsim will need
@@ -94,12 +95,13 @@ class Chainsim {
     this.frame.y = 128;
 
     // this.animationState = this.idle;
-    this.animationState = this.simulateStep;
+    this.animationState = this.idle;
+
+    globalThis.run = () => {
+      this.simulateStep();
+    };
   }
 
-  /////////////////////////////
-  // Animation State Methods //
-  /////////////////////////////
   private gameLoop(delta: number) {
     this.animationState(delta);
   }
@@ -110,60 +112,75 @@ class Chainsim {
   }
 
   /** Simulate a step. This function assumes the previous state was this.idle() */
-  private simulateStep(delta: number) {
-    this.state.stepByStep = true;
-
-    // Lock out certain controls
-    // ... To implement
-
-    // Bring current slide's PuyoField into the solver and run it
+  public simulateStep(): void {
     const puyoField = this.state.slides[this.state.slidePos].puyo;
-    this.state.solver.resetToField(puyoField);
-    this.state.solver.simulate();
-    this.state.solverStep = 0;
+
+    if (this.animationState === this.idle) {
+      // Bring current slide's PuyoField into the solver and run it
+      this.state.solver.resetToField(puyoField);
+      this.state.solver.simulate();
+      this.state.solverStep = 0;
+    }
 
     // Decide whether we're gonna animate drops or pops.
     // Run the preparation methods.
-    if (this.state.solver.states[0].hasDrops) {
-      return this.prepAnimateChainDrops(puyoField);
-    } else if (this.state.solver.states[0].hasPops) {
-      return this.prepAnimatePops(puyoField);
+    if (this.state.solver.states[this.state.solverStep].hasDrops) {
+      return this.prepAnimateChainDrops();
+    } else if (this.state.solver.states[this.state.solverStep].hasPops) {
+      // return this.prepAnimatePops(this.state.solver.states[this.state.solverStep]);
+      return this.prepAnimatePops();
     }
   }
 
   /** Update any states that need to change before we go into the dropping animation. */
-  private prepAnimateChainDrops(puyoField: PuyoField) {
+  private prepAnimateChainDrops() {
     this.animationState = this.animateChainDrops;
+
+    // Use the current solver state to setup the drop animation
+    // const puyoField = this.state.slides[this.state.slidePos].puyo;
+    const puyoField = this.state.solver.states[this.state.solverStep].puyoField;
     this.frame?.puyoLayer.prepAnimateChainDrops(puyoField);
   }
 
   private animateChainDrops(delta: number) {
     const finished = this.frame?.puyoLayer.animateChainDrops(delta);
     if (finished) {
-      console.log('No more drops!');
-
       // Advance to the next solver step.
       this.state.solverStep += 1;
 
-      if (this.state.solver.states[this.state.solverStep].hasPops) {
-        return this.prepAnimatePops((this.frame as Frame).puyoLayer.tempField);
+      if (this.state.solver.states[this.state.solverStep].hasPops && this.state.autoStep) {
+        return this.prepAnimatePops();
       } else {
-        this.animationState = this.chainFinished;
+        this.animationState = this.chainPaused;
       }
     }
   }
 
   /** Update any states that need to change before we go into the popping animation. */
-  private prepAnimatePops(puyoField: PuyoField) {
+  private prepAnimatePops() {
     this.animationState = this.animatePops;
-    this.frame?.puyoLayer.prepAnimatePops(puyoField);
+    const fieldState = this.state.solver.states[this.state.solverStep];
+    this.frame?.puyoLayer.prepAnimatePops(fieldState);
   }
 
   private animatePops(delta: number) {
-    console.log('Animating Pops');
+    const finished = this.frame?.puyoLayer.animateChainPops();
+
+    if (finished) {
+      // Advance to the next solver step.
+      this.state.solverStep += 1;
+
+      console.log('was there a drop?', this.state.solver.states[this.state.solverStep].hasDrops);
+
+      if (this.state.solver.states[this.state.solverStep].hasDrops && this.state.autoStep) {
+        return this.prepAnimateChainDrops();
+      } else {
+        this.animationState = this.chainPaused;
+      }
+    }
   }
 
-  private chainFinished(delta: number) {
+  private chainPaused(delta: number) {
     // Similar to idle, but editor functions should be disabled.
     console.log('Chain finished.');
   }

@@ -52,7 +52,7 @@ class AppState {
   public solverStep: number;
 
   // Animation controls
-  public stepByStep: boolean; // Pause simulation after each pop or drop
+  public autoStep: boolean; // Pause simulation after each pop or drop
 
   // Puyo movement
   public puyoMovement: PuyoMovement;
@@ -83,7 +83,7 @@ class AppState {
     this.solverStep = 0;
 
     // Animation controls
-    this.stepByStep = false;
+    this.autoStep = true;
 
     // Puyo Movement
     this.puyoMovement = {

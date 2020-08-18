@@ -1,9 +1,10 @@
 import * as PIXI from 'pixi.js';
 import { StateContainer } from './container';
 import { PositionMatrix } from './position';
-import { PUYONAME, PUYOTYPE } from '../solver/constants';
+import { PUYONAME } from '../solver/constants';
 import { isColored, isBlock, isNone } from '../solver/helper';
 import { NumField, PuyoField, BoolField } from '../solver/field';
+import { FieldState } from '../solver';
 import { get2d } from '../solver/helper';
 
 interface LayerSettings {
@@ -18,11 +19,11 @@ const shortBounce = ['h', '0', 'v', 'v', '0', '0', 'h', 'h', '0', 'v', 'v', '0',
 
 /** Abstract class for the Puyo, Shadow, Arrow, Cursor, and Number fields */
 abstract class Layer extends StateContainer {
-  private rows: number;
-  private cols: number;
-  private hrows: number;
-  private cellWidth: number;
-  private cellHeight: number;
+  public rows: number;
+  public cols: number;
+  public hrows: number;
+  public cellWidth: number;
+  public cellHeight: number;
   public cellPos: PositionMatrix;
   public textures: PIXI.ITextureDictionary;
   public sprites: PIXI.Sprite[];
@@ -67,21 +68,25 @@ abstract class Layer extends StateContainer {
 
 class PuyoLayer extends Layer {
   private dropDists: NumField;
+  private toPop: BoolField;
   private connectivity: NumField;
   private targetY: NumField;
   private startingField: PuyoField;
-  private tickers: NumField;
+  private dropAnimationTickers: NumField;
+  private popAnimationTicker: number;
   public tempField: PuyoField;
 
   constructor(fieldSettings: LayerSettings, textures: PIXI.ITextureDictionary) {
     super(fieldSettings, textures);
 
     this.dropDists = new NumField(fieldSettings.rows, fieldSettings.cols);
+    this.toPop = new BoolField(fieldSettings.rows, fieldSettings.cols);
     this.connectivity = new NumField(fieldSettings.rows, fieldSettings.cols);
     this.targetY = new NumField(fieldSettings.rows, fieldSettings.cols);
     this.startingField = new PuyoField(fieldSettings.rows, fieldSettings.cols);
     this.tempField = new PuyoField(fieldSettings.rows, fieldSettings.cols);
-    this.tickers = new NumField(fieldSettings.rows, fieldSettings.cols);
+    this.dropAnimationTickers = new NumField(fieldSettings.rows, fieldSettings.cols);
+    this.popAnimationTicker = 0;
 
     // Set interaction handlers
     this.setEventHandlers();
@@ -101,10 +106,11 @@ class PuyoLayer extends Layer {
         const name = PUYONAME[puyo];
         const sprite = this.sprites[r * cols + c];
 
-        // Update the x, y, connectivity back to normal.
+        // Update the x, y, connectivity, alpha back to normal.
         sprite.x = this.cellPos.get(r, c).x;
         sprite.y = this.cellPos.get(r, c).y;
         this.connectivity.set(r, c, 0);
+        sprite.alpha = 1;
 
         // If the cell isn't a Puyo, or is empty, just have to set its type + _0.png
         if (!isColored(puyo)) {
@@ -131,10 +137,10 @@ class PuyoLayer extends Layer {
         const [dn, up, rt, lf] = [1, 2, 4, 8];
         let connection = 0;
 
-        if (r < rows - 1 && field.get(r + 1, c) === puyo) connection += dn;
-        if (r > hrows && field.get(r - 1, c) === puyo) connection += up;
-        if (c < cols - 1 && field.get(r, c + 1) === puyo) connection += rt;
-        if (c > 0 && field.get(r, c - 1) === puyo) connection += lf;
+        if (r < rows - 1 && field.get(r + 1, c) === puyo && this.dropDists.get(r + 1, c) === 0) connection += dn;
+        if (r > hrows && field.get(r - 1, c) === puyo && this.dropDists.get(r - 1, c) === 0) connection += up;
+        if (c < cols - 1 && field.get(r, c + 1) === puyo && this.dropDists.get(r, c + 1) === 0) connection += rt;
+        if (c > 0 && field.get(r, c - 1) === puyo && this.dropDists.get(r, c - 1) === 0) connection += lf;
 
         // Update connectivity matrix
         this.connectivity.set(r, c, connection);
@@ -184,21 +190,9 @@ class PuyoLayer extends Layer {
     }
   }
 
-  // private removeDroppingPuyos(): void {
-  //   const rows = this.state.simSettings.rows;
-  //   const cols = this.state.simSettings.cols;
-
-  //   for (let r = 0; r < rows; r++) {
-  //     for (let c = 0; c < cols; c++) {
-  //       if (this.dropDists.get(r, c) > 0) {
-  //         this.tempField.set(r, c, PUYOTYPE.NONE);
-  //       }
-  //     }
-  //   }
-  // }
-
   public prepAnimateChainDrops(startingField: PuyoField): void {
     // 1. Run refreshSprites(startingField) to disconnect falling Puyos
+    console.log(get2d<number>(this.rows, this.cols, startingField.data));
     this.refreshSprites(startingField);
 
     // 2. Copy startingField over to tempField
@@ -212,7 +206,8 @@ class PuyoLayer extends Layer {
     //    Updates targetY.
     this.calculateTargetPosition();
 
-    // 4. Start running the animations now (different method)
+    // 4. Reset Tickers
+    this.dropAnimationTickers.reset();
   }
 
   public animateChainDrops(delta: number): boolean {
@@ -240,17 +235,17 @@ class PuyoLayer extends Layer {
         // Once the cell reaches its target position, play the bouncing animation
         // If the cell isn't colored, it doesn't need to play any animations.
         if (!isColored(this.startingField.get(r, c))) {
-          this.tickers.increment(r, c);
+          this.dropAnimationTickers.increment(r, c);
           continue;
         }
 
         // If the cell IS colored, then swap around its sprites for the animation.
-        const t = this.tickers.get(r, c);
+        const t = this.dropAnimationTickers.get(r, c);
         if (t < shortBounce.length) {
           const puyo = this.startingField.get(r, c);
           const name = PUYONAME[puyo];
           sprite.texture = this.textures[`${name}_${shortBounce[t]}.png`];
-          this.tickers.increment(r, c);
+          this.dropAnimationTickers.increment(r, c);
           continue;
         }
 
@@ -308,7 +303,7 @@ class PuyoLayer extends Layer {
           this.connectivity.set(newR, c, connection);
 
           this.dropDists.set(r, c, 0);
-          this.tickers.increment(r, c);
+          this.dropAnimationTickers.increment(r, c);
         }
       }
     }
@@ -320,7 +315,35 @@ class PuyoLayer extends Layer {
     return false;
   }
 
-  public prepAnimatePops(startingField: PuyoField): void {}
+  public prepAnimatePops(fieldState: FieldState): void {
+    // Undo connectivity for Puyos that are going to pop
+    const rows = this.state.simSettings.rows;
+    const cols = this.state.simSettings.cols;
+
+    this.toPop.copyFrom(fieldState.isPopping);
+    this.tempField.copyFrom(fieldState.puyoField);
+    this.popAnimationTicker = 0;
+  }
+
+  public animateChainPops(): boolean {
+    // Do stuff
+
+    if (this.popAnimationTicker < 30) {
+      this.popAnimationTicker += 1;
+    } else {
+      for (let r = 0; r < this.rows; r++) {
+        for (let c = 0; c < this.cols; c++) {
+          if (this.toPop.get(r, c)) {
+            this.tempField.set(r, c, 0);
+          }
+        }
+      }
+      this.refreshSprites(this.tempField);
+      return true;
+    }
+
+    return false;
+  }
 
   private setEventHandlers() {
     // To be implemented
