@@ -1,4 +1,4 @@
-import { StateContainer } from './container';
+import { SimContainer } from './container';
 import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { ASSET_PATH } from './constants';
@@ -6,10 +6,9 @@ import { Chainsim } from '.';
 import { PuyoLayer } from './field-layer';
 import { countGarbageIcons } from './math/count-garbage-icons';
 
-class GarbageTray extends StateContainer {
+class GarbageTray extends SimContainer {
   // Access to other components
   private puyoLayer: PuyoLayer;
-  private chainsim: Chainsim;
 
   private trayTextures: PIXI.ITextureDictionary;
   private puyoTextures: PIXI.ITextureDictionary;
@@ -22,11 +21,10 @@ class GarbageTray extends StateContainer {
   private targetCoords: number[];
   private showCount: boolean;
 
-  constructor(parent: StateContainer, puyoLayer: PuyoLayer, chainsim: Chainsim) {
-    super(parent);
+  constructor(chainsim: Chainsim, puyoLayer: PuyoLayer) {
+    super(chainsim);
 
     this.puyoLayer = puyoLayer;
-    this.chainsim = chainsim;
 
     this.trayTextures = this.resources[`${ASSET_PATH}/layout.json`].textures as PIXI.ITextureDictionary;
     this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
@@ -75,15 +73,16 @@ class GarbageTray extends StateContainer {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public update(delta: number): void {
     this.setVisibility();
 
-    const showGarbageUpdate = this.count !== this.state.solver.states[this.state.solverStep].garbage;
+    const showGarbageUpdate = this.count !== this.simState.solver.states[this.simState.solverStep].garbage;
     const puyoLayerBursting = this.puyoLayer.runningBurstAnimation;
     const correctState = this.chainsim.animationState === this.chainsim.animatePops;
 
     if (puyoLayerBursting && correctState && showGarbageUpdate) {
-      this.count = this.state.solver.states[this.state.solverStep].garbage;
+      this.count = this.simState.solver.states[this.simState.solverStep].garbage;
       this.prepGarbageAnimation();
       this.setNumbers();
     }

@@ -1,13 +1,10 @@
 import * as PIXI from 'pixi.js';
 import { AppState, LoadableSlideData } from './state';
-import { StateContainer } from './container';
 import { ASSET_PATH } from './constants';
 import { Frame } from './frame';
 import { ScoreDisplay } from './score';
 import { GarbageTray } from './garbage-tray';
 import { ChainCounter } from './chain-counter';
-import { PuyoField } from '../solver/field';
-import { FieldState } from '../solver';
 
 /** Subset of options available at https://pixijs.download/v5.3.3/docs/PIXI.Application.html */
 interface PixiOptions {
@@ -28,11 +25,10 @@ interface PixiOptions {
  */
 class Chainsim {
   private app: PIXI.Application;
-  private state: AppState;
   private loader: PIXI.Loader;
-  private resources: PIXI.IResourceDictionary;
   private simLoaded: boolean;
-  private root: StateContainer;
+  public state: AppState;
+  public resources: PIXI.IResourceDictionary;
 
   private frame: Frame | undefined;
   private scoreDisplay: ScoreDisplay | undefined;
@@ -56,10 +52,6 @@ class Chainsim {
     this.loader = new PIXI.Loader();
     this.resources = this.loader.resources;
 
-    // Set the stage
-    this.root = new StateContainer(undefined, this.state, this.resources);
-    this.app.stage.addChild(this.root);
-
     // Set default animation state
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     this.animationState = () => {};
@@ -74,8 +66,8 @@ class Chainsim {
       .add(`${ASSET_PATH}/tools.json`)
       .load()
       .onComplete.add(() => {
-        this.init();
         this.simLoaded = true;
+        this.init();
         this.app.ticker.add((delta: number) => this.gameLoop(delta));
 
         // setInterval(() => {
@@ -93,26 +85,30 @@ class Chainsim {
     graphics.beginFill(0x00ff00);
     graphics.drawRect(0, 0, 630, 1000);
     graphics.endFill();
-    this.root.addChild(graphics);
+    this.app.stage.addChild(graphics);
 
-    this.frame = new Frame(this.root);
+    this.frame = new Frame(this);
     this.frame.x = 0;
     this.frame.y = 132;
+    this.app.stage.addChild(this.frame);
 
-    this.scoreDisplay = new ScoreDisplay(this.root, this.frame.puyoLayer, this);
+    this.scoreDisplay = new ScoreDisplay(this, this.frame.puyoLayer);
     this.scoreDisplay.x = 32;
     this.scoreDisplay.y = 935;
+    this.app.stage.addChild(this.scoreDisplay);
     this.app.ticker.add(() => this.scoreDisplay?.update());
 
-    this.garbageTray = new GarbageTray(this.root, this.frame.puyoLayer, this);
+    this.garbageTray = new GarbageTray(this, this.frame.puyoLayer);
     this.garbageTray.x = 337;
     this.garbageTray.y = 915;
     this.garbageTray.scale.set(0.7, 0.7);
+    this.app.stage.addChild(this.garbageTray);
     this.app.ticker.add((delta: number) => this.garbageTray?.update(delta));
 
-    this.chainCounter = new ChainCounter(this.root, this.frame.puyoLayer, this);
+    this.chainCounter = new ChainCounter(this, this.frame.puyoLayer);
     this.chainCounter.x = 432;
     this.chainCounter.y = 836;
+    this.app.stage.addChild(this.chainCounter);
     this.app.ticker.add((delta: number) => this.chainCounter?.update(delta));
 
     this.animationState = this.idle;
@@ -128,7 +124,7 @@ class Chainsim {
   }
 
   /** Chain solver inactive, no other actions */
-  private idle(delta: number) {
+  public idle(delta: number): void {
     this.frame?.update(delta);
   }
 
@@ -184,6 +180,7 @@ class Chainsim {
     this.frame?.puyoLayer.prepAnimatePops(fieldState);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public animatePops(delta: number): void {
     const finished = this.frame?.puyoLayer.animateChainPops();
 
@@ -199,6 +196,7 @@ class Chainsim {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private chainPaused(delta: number) {
     // Similar to idle, but editor functions should be disabled.
     console.log('Chain finished.');

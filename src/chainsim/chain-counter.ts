@@ -1,14 +1,13 @@
-import { StateContainer } from './container';
+import { SimContainer } from './container';
 import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { ASSET_PATH } from './constants';
 import { Chainsim } from '.';
 import { PuyoLayer } from './field-layer';
 
-class ChainCounter extends StateContainer {
+class ChainCounter extends SimContainer {
   // Access to other components
   private puyoLayer: PuyoLayer;
-  private chainsim: Chainsim;
   private container: PIXI.Container;
 
   private textures: PIXI.ITextureDictionary;
@@ -21,8 +20,8 @@ class ChainCounter extends StateContainer {
   private velocity: number;
   private acceleration: number;
 
-  constructor(parent: StateContainer, puyoLayer: PuyoLayer, chainsim: Chainsim) {
-    super(parent);
+  constructor(chainsim: Chainsim, puyoLayer: PuyoLayer) {
+    super(chainsim);
 
     this.puyoLayer = puyoLayer;
     this.chainsim = chainsim;
@@ -59,13 +58,14 @@ class ChainCounter extends StateContainer {
     this.acceleration = -2;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public update(delta: number): void {
-    const showNumberUpdate = this.chain !== this.state.solver.states[this.state.solverStep].chainLength;
+    const showNumberUpdate = this.chain !== this.simState.solver.states[this.simState.solverStep].chainLength;
     const puyoLayerBursting = this.puyoLayer.runningBurstAnimation;
     const correctState = this.chainsim.animationState === this.chainsim.animatePops;
 
     if (puyoLayerBursting && correctState && showNumberUpdate) {
-      this.chain = this.state.solver.states[this.state.solverStep].chainLength;
+      this.chain = this.simState.solver.states[this.simState.solverStep].chainLength;
       this.prepAnimation();
     }
 

@@ -1,19 +1,18 @@
-import { StateContainer } from './container';
+import { SimContainer } from './container';
 import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { ASSET_PATH } from './constants';
 import { PuyoLayer } from './field-layer';
 import { Chainsim } from '.';
 
-class ScoreDisplay extends StateContainer {
+class ScoreDisplay extends SimContainer {
   private textures: PIXI.ITextureDictionary;
   private sprites: Sprite[];
   private puyoLayer: PuyoLayer;
-  private chainsim: Chainsim;
   private score: number;
 
-  constructor(parent: StateContainer, puyoLayer: PuyoLayer, chainsim: Chainsim) {
-    super(parent);
+  constructor(chainsim: Chainsim, puyoLayer: PuyoLayer) {
+    super(chainsim);
 
     this.textures = this.resources[`${ASSET_PATH}/scoreFont.json`].textures as PIXI.ITextureDictionary;
     this.sprites = [];
@@ -33,12 +32,12 @@ class ScoreDisplay extends StateContainer {
   }
 
   public update(): void {
-    const showScoreUpdate = this.score !== this.state.solver.states[this.state.solverStep].score;
+    const showScoreUpdate = this.score !== this.simState.solver.states[this.simState.solverStep].score;
 
     // The displayed score needs to be slightly older than what's in the solver state
     // so it can display without glitching during the popping animation.
     if (this.chainsim.animationState !== this.chainsim.animatePops) {
-      this.score = this.state.solver.states[this.state.solverStep].score;
+      this.score = this.simState.solver.states[this.simState.solverStep].score;
     }
 
     // Check if the puyoLayer is playing the popping animation.
@@ -74,7 +73,7 @@ class ScoreDisplay extends StateContainer {
   }
 
   private showMultipliers(): void {
-    const { PC, CB, GB, CP } = this.state.solver.states[this.state.solverStep];
+    const { PC, CB, GB, CP } = this.simState.solver.states[this.simState.solverStep];
     const left = (PC * 10).toString();
     const right = Math.min(Math.max(GB + CB + CP, 1), 999).toString();
 

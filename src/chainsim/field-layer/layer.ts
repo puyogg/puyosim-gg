@@ -1,19 +1,12 @@
 import * as PIXI from 'pixi.js';
-import { StateContainer } from '../container';
+import { SimContainer } from '../container';
 import { PositionMatrix } from '../position';
 import { NumField, PuyoField, BoolField } from '../../solver/field';
 import { ASSET_PATH } from '../constants';
-
-interface LayerSettings {
-  rows: number;
-  hrows: number;
-  cols: number;
-  cellWidth: number;
-  cellHeight: number;
-}
+import { Chainsim } from '..';
 
 /** Abstract class for the Puyo, Shadow, Arrow, Cursor, and Number fields */
-abstract class Layer extends StateContainer {
+abstract class Layer extends SimContainer {
   public rows: number;
   public cols: number;
   public hrows: number;
@@ -24,20 +17,18 @@ abstract class Layer extends StateContainer {
   public toolTextures: PIXI.ITextureDictionary;
   public sprites: PIXI.Sprite[];
 
-  constructor(parent: StateContainer, fieldSettings: LayerSettings) {
-    super(parent);
-    this.rows = fieldSettings.rows;
-    this.cols = fieldSettings.cols;
-    this.hrows = fieldSettings.hrows;
-    this.cellWidth = fieldSettings.cellWidth;
-    this.cellHeight = fieldSettings.cellHeight;
+  /** Remember to call init at the end of the extended class's constructor function. */
+  constructor(chainsim: Chainsim) {
+    super(chainsim);
+    this.rows = this.chainsim.state.simSettings.rows;
+    this.cols = this.chainsim.state.simSettings.cols;
+    this.hrows = this.chainsim.state.simSettings.hrows;
+    this.cellWidth = this.chainsim.state.pxSizing.cellWidth;
+    this.cellHeight = this.chainsim.state.pxSizing.cellHeight;
     this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
     this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
     this.cellPos = new PositionMatrix(this.rows, this.cols, this.cellWidth, this.cellHeight);
     this.sprites = [];
-
-    // Place empty sprites onto the field
-    this.init();
   }
 
   public abstract init(): void;
@@ -45,4 +36,4 @@ abstract class Layer extends StateContainer {
   public abstract refreshSprites(field: PuyoField | BoolField | NumField): void;
 }
 
-export { Layer, LayerSettings };
+export { Layer };

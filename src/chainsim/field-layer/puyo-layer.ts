@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { StateContainer } from '../container';
-import { Layer, LayerSettings } from './layer';
+import { Layer } from './layer';
 import { PUYONAME, PUYOTYPE } from '../../solver/constants';
 import { isColored, isBlock, isNone } from '../../solver/helper';
 import { NumField, PuyoField } from '../../solver/field';
@@ -8,6 +7,7 @@ import { FieldState, Pos } from '../../solver';
 import { colorPop } from '../animation/color-pop';
 import { garbagePop } from '../animation/garbage-pop';
 import { getSplitGroups, getStaggerValues } from '../animation/popping-stagger';
+import { Chainsim } from '..';
 
 const shortBounce = ['h', '0', 'v', 'v', '0', '0', 'h', 'h', '0', 'v', 'v', '0', '0', '0'];
 
@@ -28,15 +28,15 @@ class PuyoLayer extends Layer {
   public runningPopAnimation: boolean; // Need to track this for the score display
   public runningBurstAnimation: boolean; // Need to track this for garbage tray & chain counter
 
-  constructor(parent: StateContainer, fieldSettings: LayerSettings) {
-    super(parent, fieldSettings);
+  constructor(chainsim: Chainsim) {
+    super(chainsim);
 
-    this.dropDists = new NumField(fieldSettings.rows, fieldSettings.cols);
-    this.connectivity = new NumField(fieldSettings.rows, fieldSettings.cols);
-    this.targetY = new NumField(fieldSettings.rows, fieldSettings.cols);
-    this.startingField = new PuyoField(fieldSettings.rows, fieldSettings.cols);
-    this.tempField = new PuyoField(fieldSettings.rows, fieldSettings.cols);
-    this.dropAnimationTickers = new NumField(fieldSettings.rows, fieldSettings.cols);
+    this.dropDists = new NumField(this.rows, this.cols);
+    this.connectivity = new NumField(this.rows, this.cols);
+    this.targetY = new NumField(this.rows, this.cols);
+    this.startingField = new PuyoField(this.rows, this.cols);
+    this.tempField = new PuyoField(this.rows, this.cols);
+    this.dropAnimationTickers = new NumField(this.rows, this.cols);
     this.popAnimationTicker = 0;
     this.poppingGroups = [];
     this.poppingStagger = [];
@@ -46,6 +46,7 @@ class PuyoLayer extends Layer {
     this.runningPopAnimation = false;
     this.runningBurstAnimation = false;
 
+    this.init();
     // Set interaction handlers
     this.setEventHandlers();
   }
@@ -67,21 +68,19 @@ class PuyoLayer extends Layer {
         this.addChild(sprite);
       }
     }
+
+    this.refreshSprites(this.simState.slides[this.simState.slidePos].puyo);
   }
 
   public refreshSprites(field: PuyoField): void {
-    const rows = this.state.simSettings.rows;
-    const hrows = this.state.simSettings.hrows;
-    const cols = this.state.simSettings.cols;
-
     this.setDropDists(field);
 
     // Loop over each Puyo...
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
         const puyo = field.get(r, c);
         const name = PUYONAME[puyo];
-        const sprite = this.sprites[r * cols + c];
+        const sprite = this.sprites[r * this.cols + c];
 
         // Update the x, y, connectivity, alpha back to normal.
         sprite.x = this.cellPos.get(r, c).x;
@@ -98,7 +97,7 @@ class PuyoLayer extends Layer {
 
         // Now for the colored Puyos...
         // Don't need to set connections for Puyos in the hidden rows
-        if (r < hrows) {
+        if (r < this.hrows) {
           sprite.texture = this.puyoTextures[`${name}_0.png`];
           continue;
         }
@@ -115,9 +114,9 @@ class PuyoLayer extends Layer {
         const [dn, up, rt, lf] = [1, 2, 4, 8];
         let connection = 0;
 
-        if (r < rows - 1 && field.get(r + 1, c) === puyo && this.dropDists.get(r + 1, c) === 0) connection += dn;
-        if (r > hrows && field.get(r - 1, c) === puyo && this.dropDists.get(r - 1, c) === 0) connection += up;
-        if (c < cols - 1 && field.get(r, c + 1) === puyo && this.dropDists.get(r, c + 1) === 0) connection += rt;
+        if (r < this.rows - 1 && field.get(r + 1, c) === puyo && this.dropDists.get(r + 1, c) === 0) connection += dn;
+        if (r > this.hrows && field.get(r - 1, c) === puyo && this.dropDists.get(r - 1, c) === 0) connection += up;
+        if (c < this.cols - 1 && field.get(r, c + 1) === puyo && this.dropDists.get(r, c + 1) === 0) connection += rt;
         if (c > 0 && field.get(r, c - 1) === puyo && this.dropDists.get(r, c - 1) === 0) connection += lf;
 
         // Update connectivity matrix
@@ -129,8 +128,8 @@ class PuyoLayer extends Layer {
   }
 
   private setDropDists(field: PuyoField): void {
-    const rows = this.state.simSettings.rows;
-    const cols = this.state.simSettings.cols;
+    const rows = this.simState.simSettings.rows;
+    const cols = this.simState.simSettings.cols;
     // const slideInd = this.state.slidePos;
     // const field = this.state.slides[slideInd].puyo;
 
@@ -156,12 +155,12 @@ class PuyoLayer extends Layer {
    * The calculation is based off of dropDists from the solver (not the one in this class).
    */
   private calculateTargetPosition(): void {
-    const rows = this.state.simSettings.rows;
-    const cols = this.state.simSettings.cols;
+    const rows = this.simState.simSettings.rows;
+    const cols = this.simState.simSettings.cols;
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        const dist = this.dropDists.get(r, c) * this.state.pxSizing.cellHeight;
+        const dist = this.dropDists.get(r, c) * this.simState.pxSizing.cellHeight;
         const target = this.cellPos.get(r, c).y + dist;
         this.targetY.set(r, c, target);
       }
@@ -190,34 +189,24 @@ class PuyoLayer extends Layer {
     // console.log(get2d<number>(this.rows, this.cols, this.dropDists.data));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public animateChainDrops(delta: number): boolean {
-    const rows = this.state.simSettings.rows;
-    const cols = this.state.simSettings.cols;
-    const hrows = this.state.simSettings.hrows;
-
-    for (let r = rows - 1; r >= 0; r--) {
-      for (let c = 0; c < cols; c++) {
+    for (let r = this.rows - 1; r >= 0; r--) {
+      for (let c = 0; c < this.cols; c++) {
         // If this Puyo never needed to drop, skip
         const cellDist = this.dropDists.get(r, c);
         if (cellDist === 0) continue;
 
         // If the Puyo hasn't reached its target position yet, add more y
         const target = this.targetY.get(r, c);
-        const sprite = this.sprites[r * cols + c];
+        const sprite = this.sprites[r * this.cols + c];
         if (sprite.y < target) {
-          sprite.y += this.state.puyoMovement.dropSpeedDuringChain;
+          sprite.y += this.simState.puyoMovement.dropSpeedDuringChain;
           continue;
         }
 
         // If script reaches this point, then (sprite.y >= target)
         sprite.y = target;
-
-        // // Once the cell reaches its target position, play the bouncing animation
-        // // If the cell isn't colored, it doesn't need to play any animations.
-        // if (!isColored(this.startingField.get(r, c))) {
-        //   this.dropAnimationTickers.increment(r, c);
-        //   continue;
-        // }
 
         // If the cell IS colored, then swap around its sprites for the animation.
         const t = this.dropAnimationTickers.get(r, c);
@@ -241,38 +230,38 @@ class PuyoLayer extends Layer {
           this.tempField.set(r, c, 0);
 
           // put the sprite that fell back to its original position, empty
-          this.sprites[r * cols + c].x = this.cellPos.get(r, c).x;
-          this.sprites[r * cols + c].y = this.cellPos.get(r, c).y;
-          this.sprites[r * cols + c].texture = this.puyoTextures['spacer_0.png'];
+          this.sprites[r * this.cols + c].x = this.cellPos.get(r, c).x;
+          this.sprites[r * this.cols + c].y = this.cellPos.get(r, c).y;
+          this.sprites[r * this.cols + c].texture = this.puyoTextures['spacer_0.png'];
           this.connectivity.set(r, c, 0);
 
           // If this was a colored Puyo, update the new puyo's connectivity, along with its neighbors.
           if (isColored(puyo)) {
             let connection = 0;
             // Check down
-            if (newR < rows - 1 && puyo === this.tempField.get(newR + 1, c)) {
+            if (newR < this.rows - 1 && puyo === this.tempField.get(newR + 1, c)) {
               // const [dn, up, rt, lf] = [1, 2, 4, 8];
               connection += 1;
               const nConnection = this.connectivity.addAt(newR + 1, c, 2);
               const nPuyo = this.tempField.get(newR + 1, c);
               const nName = PUYONAME[nPuyo];
-              this.sprites[(newR + 1) * cols + c].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
+              this.sprites[(newR + 1) * this.cols + c].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             // Check up
-            if (newR > hrows && puyo === this.tempField.get(newR - 1, c)) {
+            if (newR > this.hrows && puyo === this.tempField.get(newR - 1, c)) {
               connection += 2;
               const nConnection = this.connectivity.addAt(newR - 1, c, 1);
               const nPuyo = this.tempField.get(newR - 1, c);
               const nName = PUYONAME[nPuyo];
-              this.sprites[(newR - 1) * cols + c].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
+              this.sprites[(newR - 1) * this.cols + c].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             // check right
-            if (c < cols - 1 && puyo === this.tempField.get(newR, c + 1)) {
+            if (c < this.cols - 1 && puyo === this.tempField.get(newR, c + 1)) {
               connection += 4;
               const nConnection = this.connectivity.addAt(newR, c + 1, 8);
               const nPuyo = this.tempField.get(newR, c + 1);
               const nName = PUYONAME[nPuyo];
-              this.sprites[newR * cols + c + 1].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
+              this.sprites[newR * this.cols + c + 1].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             // check left
             if (c > 0 && puyo === this.tempField.get(newR, c - 1)) {
@@ -280,12 +269,12 @@ class PuyoLayer extends Layer {
               const nConnection = this.connectivity.addAt(newR, c - 1, 4);
               const nPuyo = this.tempField.get(newR, c - 1);
               const nName = PUYONAME[nPuyo];
-              this.sprites[newR * cols + c - 1].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
+              this.sprites[newR * this.cols + c - 1].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
-            this.sprites[newR * cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_${connection}.png`];
+            this.sprites[newR * this.cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_${connection}.png`];
             this.connectivity.set(newR, c, connection);
           } else {
-            this.sprites[newR * cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_0.png`];
+            this.sprites[newR * this.cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_0.png`];
             this.connectivity.set(newR, c, 0);
           }
 

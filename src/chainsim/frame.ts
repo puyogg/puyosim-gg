@@ -1,30 +1,21 @@
-import { StateContainer } from './container';
-import { LayerSettings, PuyoLayer } from './field-layer';
+import { SimContainer } from './container';
+import { PuyoLayer } from './field-layer';
 import { ASSET_PATH } from './constants';
 import { Sprite } from 'pixi.js';
+import { Chainsim } from '.';
 
 /** The field frame, along with the character background */
-class Frame extends StateContainer {
+class Frame extends SimContainer {
   public puyoLayer: PuyoLayer;
 
-  constructor(parent: StateContainer) {
-    super(parent);
+  constructor(chainsim: Chainsim) {
+    super(chainsim);
 
     this.initCharBG();
     this.initBorders();
 
-    // Lay out the Puyo Layer
-    const fieldSettings: LayerSettings = {
-      rows: this.state.simSettings.rows,
-      hrows: this.state.simSettings.hrows,
-      cols: this.state.simSettings.cols,
-      cellWidth: this.state.pxSizing.cellWidth,
-      cellHeight: this.state.pxSizing.cellHeight,
-    };
-
-    this.puyoLayer = new PuyoLayer(this, fieldSettings);
-    this.addChild(this.puyoLayer); // Needs to be a child to receive root state data.
-    this.puyoLayer.refreshSprites(this.state.slides[0].puyo);
+    this.puyoLayer = new PuyoLayer(chainsim);
+    this.addChild(this.puyoLayer);
     this.puyoLayer.x = 25;
     this.puyoLayer.y = -8;
   }

@@ -1,16 +1,17 @@
 import * as PIXI from 'pixi.js';
-import { Layer, LayerSettings } from './layer';
-import { PUYONAME, PUYOTYPE } from '../../solver/constants';
-import { FieldState, Pos } from '../../solver';
-import { colorPop } from '../animation/color-pop';
-import { garbagePop } from '../animation/garbage-pop';
-import { getSplitGroups, getStaggerValues } from '../animation/popping-stagger';
-import { StateContainer } from '../container';
+import { Layer } from './layer';
+import { PUYONAME } from '../../solver/constants';
 import { PuyoField } from '../../solver/field';
+import { Chainsim } from '..';
 
 class ShadowLayer extends Layer {
-  constructor(parent: StateContainer, fieldSettings: LayerSettings) {
-    super(parent, fieldSettings);
+  private slidePos: number;
+
+  constructor(chainsim: Chainsim) {
+    super(chainsim);
+
+    this.chainsim = chainsim;
+    this.slidePos = this.simState.slidePos;
   }
 
   /** Set the sprites */
@@ -45,8 +46,15 @@ class ShadowLayer extends Layer {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public update(delta: number): void {
-    //
+    const slideChanged = this.slidePos !== this.simState.slidePos;
+    const correctState = this.chainsim.animationState === this.chainsim.idle;
+
+    if (slideChanged && correctState) {
+      this.slidePos = this.simState.slidePos;
+      this.refreshSprites(this.simState.slides[this.simState.slidePos].shadow);
+    }
   }
 }
 

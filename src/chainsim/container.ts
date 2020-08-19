@@ -1,33 +1,23 @@
 import * as PIXI from 'pixi.js';
 import { AppState } from './state';
+import { Chainsim } from '.';
 
-/** Extension of a PIXI.Container that can pass down the root game state. */
-class StateContainer extends PIXI.Container {
-  private _state: AppState | undefined;
-  private _resources: PIXI.IResourceDictionary | undefined;
+/** Extension of a PIXI.Container with a reference back to the Chainsim instance. */
+class SimContainer extends PIXI.Container {
+  public simState: AppState;
+  public resources: PIXI.IResourceDictionary;
+  public chainsim: Chainsim;
 
-  constructor(parent?: StateContainer, state?: AppState, resources?: PIXI.IResourceDictionary) {
+  /**
+   * Creates a new SimContainer for holding PIXI Sprites
+   * @param chainsim A reference to the main controller
+   */
+  constructor(chainsim: Chainsim) {
     super();
-    if (parent) {
-      parent.addChild(this);
-    }
-    this._state = state || undefined;
-    this._resources = resources || undefined;
-  }
-
-  get state(): AppState {
-    if (this._state) return this._state;
-
-    const parent = this.parent as StateContainer;
-    return parent.state;
-  }
-
-  get resources(): PIXI.IResourceDictionary {
-    if (this._resources) return this._resources;
-
-    const parent = this.parent as StateContainer;
-    return parent.resources;
+    this.simState = chainsim.state;
+    this.resources = chainsim.resources;
+    this.chainsim = chainsim;
   }
 }
 
-export { StateContainer };
+export { SimContainer };
