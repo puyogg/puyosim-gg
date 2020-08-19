@@ -3,6 +3,8 @@ import { AppState, LoadableSlideData } from './state';
 import { StateContainer } from './container';
 import { ASSET_PATH } from './constants';
 import { Frame } from './frame';
+import { ScoreDisplay } from './score';
+import { GarbageTray } from './garbage-tray';
 import { PuyoField } from '../solver/field';
 import { FieldState } from '../solver';
 
@@ -32,10 +34,12 @@ class Chainsim {
   private root: StateContainer;
 
   private frame: Frame | undefined;
+  private scoreDisplay: ScoreDisplay | undefined;
+  private garbageTray: GarbageTray | undefined;
 
   // Function that plays on every tick. Swap it out with other methods.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private animationState: (delta: number, ...args: any[]) => void;
+  public animationState: (delta: number, ...args: any[]) => void;
 
   constructor(options: PixiOptions, slideData?: LoadableSlideData) {
     this.simLoaded = false;
@@ -66,16 +70,15 @@ class Chainsim {
       .add(`${ASSET_PATH}/scoreFont.json`)
       .add(`${ASSET_PATH}/chain_font.json`)
       .add(`${ASSET_PATH}/tools.json`)
-      .load(() => {
-        this.init();
-      })
+      .load()
       .onComplete.add(() => {
+        this.init();
         this.simLoaded = true;
-        // this.app.ticker.add((delta: number) => this.gameLoop(delta));
+        this.app.ticker.add((delta: number) => this.gameLoop(delta));
 
-        setInterval(() => {
-          this.gameLoop(1);
-        }, 30);
+        // setInterval(() => {
+        //   this.gameLoop(1);
+        // }, 30);
       });
 
     // Add components that this instance of Chainsim will need
@@ -92,9 +95,20 @@ class Chainsim {
 
     this.frame = new Frame(this.root);
     this.frame.x = 0;
-    this.frame.y = 128;
+    this.frame.y = 132;
 
-    // this.animationState = this.idle;
+    this.scoreDisplay = new ScoreDisplay(this.root, this.frame.puyoLayer, this);
+    this.scoreDisplay.x = 32;
+    this.scoreDisplay.y = 935;
+    // Let the score display update itself
+    this.app.ticker.add(() => this.scoreDisplay?.update());
+
+    this.garbageTray = new GarbageTray(this.root, this.frame.puyoLayer, this);
+    this.garbageTray.x = 337;
+    this.garbageTray.y = 915;
+    this.garbageTray.scale.set(0.7, 0.7);
+    this.app.ticker.add((delta: number) => this.garbageTray?.update(delta));
+
     this.animationState = this.idle;
 
     globalThis.run = () => {
@@ -103,6 +117,7 @@ class Chainsim {
   }
 
   private gameLoop(delta: number) {
+    // console.log('Current state:', this.animationState);
     this.animationState(delta);
   }
 
@@ -121,6 +136,8 @@ class Chainsim {
       this.state.solver.simulate();
       this.state.solverStep = 0;
     }
+
+    console.log(this.state.solver);
 
     // Decide whether we're gonna animate drops or pops.
     // Run the preparation methods.
@@ -163,14 +180,12 @@ class Chainsim {
     this.frame?.puyoLayer.prepAnimatePops(fieldState);
   }
 
-  private animatePops(delta: number) {
+  public animatePops(delta: number): void {
     const finished = this.frame?.puyoLayer.animateChainPops();
 
     if (finished) {
       // Advance to the next solver step.
       this.state.solverStep += 1;
-
-      console.log('was there a drop?', this.state.solver.states[this.state.solverStep].hasDrops);
 
       if (this.state.solver.states[this.state.solverStep].hasDrops && this.state.autoStep) {
         return this.prepAnimateChainDrops();

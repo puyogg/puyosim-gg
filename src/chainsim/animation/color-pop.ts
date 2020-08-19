@@ -25,29 +25,37 @@ function colorPop(
     return false;
   }
 
+  sprite.visible = true;
   if (t < 39) {
-    // Swap to the shocked face
     sprite.texture = textures[`${name}_shocked.png`];
     return false;
   }
 
   // The bursting animation is staggered.
   const burstDelay = stagger * 2;
-  const finalFrame = 39 + 6 + burstDelay;
-  if (t < finalFrame && t >= t + burstDelay) {
-    const t2 = t - t + burstDelay;
+  const burstDisappear = 39 + 6 + burstDelay;
+  if (t < burstDisappear) {
+    if (t >= 39 + burstDelay) {
+      const t2 = t - (39 + burstDelay);
 
-    // show the big burst the first two frames
-    if (t2 < 2) {
-      sprite.texture = textures[`${name}_burst_0.png`];
-    } else {
-      sprite.texture = textures[`${name}_burst_1.png`];
+      // show the big burst the first two frames
+      if (t2 < 2) {
+        sprite.texture = textures[`${name}_burst_0.png`];
+      } else {
+        sprite.texture = textures[`${name}_burst_1.png`];
+      }
     }
     return false;
   }
 
   // Final case
   sprite.visible = false;
+
+  // about 6 frames of air time
+  if (t < burstDisappear + 6) {
+    return false;
+  }
+
   return true;
 }
 

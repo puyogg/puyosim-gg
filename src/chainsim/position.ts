@@ -1,4 +1,4 @@
-interface Pos {
+interface Coord {
   x: number;
   y: number;
 }
@@ -24,11 +24,11 @@ class PositionMatrix {
     }
   }
 
-  public get(row: number, col: number): Pos {
+  public get(row: number, col: number): Coord {
     const x = this.xPos[row * this.cols + col];
     const y = this.yPos[row * this.cols + col];
     return { x: x, y: y };
   }
 }
 
-export { Pos, PositionMatrix };
+export { Coord, PositionMatrix };

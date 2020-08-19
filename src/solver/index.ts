@@ -165,7 +165,10 @@ class ChainSolver {
         const puyo = puyoField.get(r, c);
 
         // Ignore if it's not a colored Puyo
-        if (!isColored(puyo)) continue;
+        if (!isColored(puyo)) {
+          this.boolField.set(r, c, true);
+          continue;
+        }
 
         // Ignore if it's already been checked
         if (this.boolField.get(r, c)) continue;
@@ -241,16 +244,17 @@ class ChainSolver {
 
     // Update hasPops
     state.hasPops = posToPop.length > 0;
-    state.poppingGroups = poppingGroups;
 
-    // Might as well calculate bonuses while we're here.
-    state.chainLength++;
-    state.PC = posToPop.length;
-    state.GB = sizes.reduce((a, v) => this.groupBonus[Math.min(v - this.puyoToPop, this.groupBonus.length - 1)], 0);
-    state.CB = this.colorBonus[colors.size - 1];
-    state.CP = this.chainPower[Math.min(state.chainLength - 1, this.chainPower.length - 1)];
-    state.score += 10 * state.PC + Math.min(Math.max(state.GB + state.CB + state.CP, 1), 999);
-    state.garbage = Math.floor(state.score / this.targetPoint); // Not gonna bother with leftover NP
+    if (state.hasPops) {
+      state.poppingGroups = poppingGroups;
+      state.chainLength++;
+      state.PC = posToPop.length;
+      state.GB = sizes.reduce((a, v) => this.groupBonus[Math.min(v - this.puyoToPop, this.groupBonus.length - 1)], 0);
+      state.CB = this.colorBonus[colors.size - 1];
+      state.CP = this.chainPower[Math.min(state.chainLength - 1, this.chainPower.length - 1)];
+      state.score += 10 * state.PC * Math.min(Math.max(state.GB + state.CB + state.CP, 1), 999);
+      state.garbage = Math.floor(state.score / this.targetPoint); // Not gonna bother with leftover NP
+    }
   }
 
   private applyPops(): void {

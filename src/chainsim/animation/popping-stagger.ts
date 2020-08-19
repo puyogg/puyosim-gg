@@ -23,7 +23,7 @@ function getStaggerValues(groups: Pos[][]): number[][] {
   for (const group of groups) {
     const values: number[] = [];
     for (let i = 0; i < group.length; i++) {
-      values[0] = i;
+      values[i] = i;
     }
     staggers.push(values);
   }

@@ -4,7 +4,10 @@ import { PositionMatrix } from './position';
 import { PUYONAME, PUYOTYPE } from '../solver/constants';
 import { isColored, isBlock, isNone } from '../solver/helper';
 import { NumField, PuyoField, BoolField } from '../solver/field';
-import { FieldState } from '../solver';
+import { FieldState, Pos } from '../solver';
+import { colorPop } from './animation/color-pop';
+import { garbagePop } from './animation/garbage-pop';
+import { getSplitGroups, getStaggerValues } from './animation/popping-stagger';
 import { get2d } from '../solver/helper';
 
 interface LayerSettings {
@@ -69,26 +72,35 @@ abstract class Layer extends StateContainer {
 class PuyoLayer extends Layer {
   private startingField: PuyoField;
   private dropDists: NumField;
-  private toPop: BoolField;
   private connectivity: NumField;
   private targetY: NumField;
   private dropAnimationTickers: NumField;
   private dropFinishDelay: number;
   private popAnimationTicker: number;
+  private poppingGroups: Pos[][];
+  private poppingGarbage: Pos[];
+  private poppingStagger: number[][];
+  private garbageAdjacency: number[];
+
   public tempField: PuyoField;
+  public runningPopAnimation: boolean; // Need to track this for the score display
 
   constructor(fieldSettings: LayerSettings, textures: PIXI.ITextureDictionary) {
     super(fieldSettings, textures);
 
     this.dropDists = new NumField(fieldSettings.rows, fieldSettings.cols);
-    this.toPop = new BoolField(fieldSettings.rows, fieldSettings.cols);
     this.connectivity = new NumField(fieldSettings.rows, fieldSettings.cols);
     this.targetY = new NumField(fieldSettings.rows, fieldSettings.cols);
     this.startingField = new PuyoField(fieldSettings.rows, fieldSettings.cols);
     this.tempField = new PuyoField(fieldSettings.rows, fieldSettings.cols);
     this.dropAnimationTickers = new NumField(fieldSettings.rows, fieldSettings.cols);
     this.popAnimationTicker = 0;
+    this.poppingGroups = [];
+    this.poppingStagger = [];
+    this.poppingGarbage = [];
+    this.garbageAdjacency = [];
     this.dropFinishDelay = 0;
+    this.runningPopAnimation = false;
 
     // Set interaction handlers
     this.setEventHandlers();
@@ -195,7 +207,6 @@ class PuyoLayer extends Layer {
 
   public prepAnimateChainDrops(startingField: PuyoField): void {
     // 1. Run refreshSprites(startingField) to disconnect falling Puyos
-    console.log(get2d<number>(this.rows, this.cols, startingField.data));
     this.refreshSprites(startingField);
 
     // 2. Copy startingField over to tempField
@@ -212,6 +223,8 @@ class PuyoLayer extends Layer {
     // 4. Reset Tickers
     this.dropAnimationTickers.reset();
     this.dropFinishDelay = 0;
+
+    // console.log(get2d<number>(this.rows, this.cols, this.dropDists.data));
   }
 
   public animateChainDrops(delta: number): boolean {
@@ -236,19 +249,22 @@ class PuyoLayer extends Layer {
         // If script reaches this point, then (sprite.y >= target)
         sprite.y = target;
 
-        // Once the cell reaches its target position, play the bouncing animation
-        // If the cell isn't colored, it doesn't need to play any animations.
-        if (!isColored(this.startingField.get(r, c))) {
-          this.dropAnimationTickers.increment(r, c);
-          continue;
-        }
+        // // Once the cell reaches its target position, play the bouncing animation
+        // // If the cell isn't colored, it doesn't need to play any animations.
+        // if (!isColored(this.startingField.get(r, c))) {
+        //   this.dropAnimationTickers.increment(r, c);
+        //   continue;
+        // }
 
         // If the cell IS colored, then swap around its sprites for the animation.
         const t = this.dropAnimationTickers.get(r, c);
         if (t < shortBounce.length) {
           const puyo = this.startingField.get(r, c);
           const name = PUYONAME[puyo];
-          sprite.texture = this.textures[`${name}_${shortBounce[t]}.png`];
+
+          if (isColored(this.startingField.get(r, c))) {
+            sprite.texture = this.textures[`${name}_${shortBounce[t]}.png`];
+          }
           this.dropAnimationTickers.increment(r, c);
           continue;
         }
@@ -267,44 +283,48 @@ class PuyoLayer extends Layer {
           this.sprites[r * cols + c].texture = this.textures['spacer_0.png'];
           this.connectivity.set(r, c, 0);
 
-          // Update the new cell's connectivity, along with its neighbors.
-          let connection = 0;
-          // Check down
-          if (newR < rows - 1 && puyo === this.tempField.get(newR + 1, c)) {
-            // const [dn, up, rt, lf] = [1, 2, 4, 8];
-            connection += 1;
-            const nConnection = this.connectivity.addAt(newR + 1, c, 2);
-            const nPuyo = this.tempField.get(newR + 1, c);
-            const nName = PUYONAME[nPuyo];
-            this.sprites[(newR + 1) * cols + c].texture = this.textures[`${nName}_${nConnection}.png`];
+          // If this was a colored Puyo, update the new puyo's connectivity, along with its neighbors.
+          if (isColored(puyo)) {
+            let connection = 0;
+            // Check down
+            if (newR < rows - 1 && puyo === this.tempField.get(newR + 1, c)) {
+              // const [dn, up, rt, lf] = [1, 2, 4, 8];
+              connection += 1;
+              const nConnection = this.connectivity.addAt(newR + 1, c, 2);
+              const nPuyo = this.tempField.get(newR + 1, c);
+              const nName = PUYONAME[nPuyo];
+              this.sprites[(newR + 1) * cols + c].texture = this.textures[`${nName}_${nConnection}.png`];
+            }
+            // Check up
+            if (newR > hrows && puyo === this.tempField.get(newR - 1, c)) {
+              connection += 2;
+              const nConnection = this.connectivity.addAt(newR - 1, c, 1);
+              const nPuyo = this.tempField.get(newR - 1, c);
+              const nName = PUYONAME[nPuyo];
+              this.sprites[(newR - 1) * cols + c].texture = this.textures[`${nName}_${nConnection}.png`];
+            }
+            // check right
+            if (c < cols - 1 && puyo === this.tempField.get(newR, c + 1)) {
+              connection += 4;
+              const nConnection = this.connectivity.addAt(newR, c + 1, 8);
+              const nPuyo = this.tempField.get(newR, c + 1);
+              const nName = PUYONAME[nPuyo];
+              this.sprites[newR * cols + c + 1].texture = this.textures[`${nName}_${nConnection}.png`];
+            }
+            // check left
+            if (c > 0 && puyo === this.tempField.get(newR, c - 1)) {
+              connection += 8;
+              const nConnection = this.connectivity.addAt(newR, c - 1, 4);
+              const nPuyo = this.tempField.get(newR, c - 1);
+              const nName = PUYONAME[nPuyo];
+              this.sprites[newR * cols + c - 1].texture = this.textures[`${nName}_${nConnection}.png`];
+            }
+            this.sprites[newR * cols + c].texture = this.textures[`${PUYONAME[puyo]}_${connection}.png`];
+            this.connectivity.set(newR, c, connection);
+          } else {
+            this.sprites[newR * cols + c].texture = this.textures[`${PUYONAME[puyo]}_0.png`];
+            this.connectivity.set(newR, c, 0);
           }
-          // Check up
-          if (newR > hrows && puyo === this.tempField.get(newR - 1, c)) {
-            connection += 2;
-            const nConnection = this.connectivity.addAt(newR - 1, c, 1);
-            const nPuyo = this.tempField.get(newR - 1, c);
-            const nName = PUYONAME[nPuyo];
-            this.sprites[(newR - 1) * cols + c].texture = this.textures[`${nName}_${nConnection}.png`];
-          }
-          // check right
-          if (c < cols - 1 && puyo === this.tempField.get(newR, c + 1)) {
-            connection += 4;
-            const nConnection = this.connectivity.addAt(newR, c + 1, 8);
-            const nPuyo = this.tempField.get(newR, c + 1);
-            const nName = PUYONAME[nPuyo];
-            this.sprites[newR * cols + c + 1].texture = this.textures[`${nName}_${nConnection}.png`];
-          }
-          // check left
-          if (c > 0 && puyo === this.tempField.get(newR, c - 1)) {
-            connection += 8;
-            const nConnection = this.connectivity.addAt(newR, c - 1, 4);
-            const nPuyo = this.tempField.get(newR, c - 1);
-            const nName = PUYONAME[nPuyo];
-            this.sprites[newR * cols + c - 1].texture = this.textures[`${nName}_${nConnection}.png`];
-          }
-
-          this.sprites[newR * cols + c].texture = this.textures[`${PUYONAME[puyo]}_${connection}.png`];
-          this.connectivity.set(newR, c, connection);
 
           this.dropDists.set(r, c, 0);
           this.dropAnimationTickers.increment(r, c);
@@ -329,39 +349,77 @@ class PuyoLayer extends Layer {
   }
 
   public prepAnimatePops(fieldState: FieldState): void {
-    this.toPop.copyFrom(fieldState.isPopping);
+    this.poppingGroups = getSplitGroups(fieldState.poppingGroups);
+    this.poppingStagger = getStaggerValues(this.poppingGroups);
+    this.poppingGarbage = [];
+    this.garbageAdjacency = [];
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        const adjValue = fieldState.garbageAdjacency.get(r, c);
+        if (adjValue > 0) {
+          this.poppingGarbage.push({ row: r, col: c });
+          this.garbageAdjacency.push(adjValue);
+        }
+      }
+    }
+
     this.tempField.copyFrom(fieldState.puyoField);
     this.popAnimationTicker = 0;
   }
 
   public animateChainPops(): boolean {
-    // Do stuff
+    const popState: boolean[] = [];
+    for (let g = 0; g < this.poppingGroups.length; g++) {
+      for (let h = 0; h < this.poppingGroups[g].length; h++) {
+        const { row: r, col: c } = this.poppingGroups[g][h];
+        const color = this.tempField.get(r, c);
+        const sprite = this.sprites[r * this.cols + c];
+        const stagger = this.poppingStagger[g][h];
+        const finished = colorPop(sprite, color, this.popAnimationTicker, stagger, this.textures);
+        popState.push(finished);
+      }
+    }
 
-    if (this.popAnimationTicker < 60) {
-      this.popAnimationTicker += 1;
+    const garbageState: boolean[] = [];
+    for (let i = 0; i < this.poppingGarbage.length; i++) {
+      const { row: r, col: c } = this.poppingGarbage[i];
+      const color = this.tempField.get(r, c);
+      const sprite = this.sprites[r * this.cols + c];
+      const adjValue = this.garbageAdjacency[i];
+      const finished = garbagePop(sprite, color, adjValue, this.popAnimationTicker, this.textures);
+      garbageState.push(finished);
+    }
+
+    if (popState.every((s) => s) && garbageState.every((s) => s)) {
+      this.runningPopAnimation = false;
+
+      // Colored Puyos:
+      for (let g = 0; g < this.poppingGroups.length; g++) {
+        for (let h = 0; h < this.poppingGroups[g].length; h++) {
+          const { row: r, col: c } = this.poppingGroups[g][h];
+          this.tempField.set(r, c, PUYOTYPE.NONE);
+        }
+      }
+
+      // Garbage Puyos
+      for (let i = 0; i < this.poppingGarbage.length; i++) {
+        const { row: r, col: c } = this.poppingGarbage[i];
+        const adjValue = this.garbageAdjacency[i];
+        const puyo = this.tempField.get(r, c);
+        if (puyo === PUYOTYPE.HARD && adjValue === 1) {
+          this.tempField.set(r, c, PUYOTYPE.GARBAGE);
+        } else {
+          this.tempField.set(r, c, PUYOTYPE.NONE);
+        }
+      }
+
+      this.refreshSprites(this.tempField);
+      return true;
     } else {
-      for (let r = 0; r < this.rows; r++) {
-        for (let c = 0; c < this.cols; c++) {
-          if (this.toPop.get(r, c)) {
-            this.tempField.set(r, c, 0);
-          }
-        }
-      }
-      this.refreshSprites(this.tempField);
-      return true;
+      this.runningPopAnimation = this.popAnimationTicker >= 8;
     }
 
-    if (this.popAnimationTicker > 60) {
-      for (let r = 0; r < this.rows; r++) {
-        for (let c = 0; c < this.cols; c++) {
-          if (this.toPop.get(r, c)) {
-            this.tempField.set(r, c, 0);
-          }
-        }
-      }
-      this.refreshSprites(this.tempField);
-      return true;
-    }
+    this.popAnimationTicker += 1;
 
     return false;
   }

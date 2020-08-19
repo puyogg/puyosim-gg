@@ -7,8 +7,8 @@ enum PUYOTYPE {
   YELLOW,
   PURPLE,
   HARD,
-  BLOCK,
   STONE,
+  BLOCK,
 }
 
 type PuyoNameMapper = { [P in PUYOTYPE]: string };
@@ -22,8 +22,8 @@ const PUYONAME: PuyoNameMapper = [
   'yellow',
   'purple',
   'hard',
-  'block',
   'stone',
+  'block',
 ];
 
 const CHAIN_POWER = {
