@@ -1,73 +1,15 @@
 import * as PIXI from 'pixi.js';
-import { StateContainer } from './container';
-import { PositionMatrix } from './position';
-import { PUYONAME, PUYOTYPE } from '../solver/constants';
-import { isColored, isBlock, isNone } from '../solver/helper';
-import { NumField, PuyoField, BoolField } from '../solver/field';
-import { FieldState, Pos } from '../solver';
-import { colorPop } from './animation/color-pop';
-import { garbagePop } from './animation/garbage-pop';
-import { getSplitGroups, getStaggerValues } from './animation/popping-stagger';
-import { get2d } from '../solver/helper';
-
-interface LayerSettings {
-  rows: number;
-  hrows: number;
-  cols: number;
-  cellWidth: number;
-  cellHeight: number;
-}
+import { StateContainer } from '../container';
+import { Layer, LayerSettings } from './layer';
+import { PUYONAME, PUYOTYPE } from '../../solver/constants';
+import { isColored, isBlock, isNone } from '../../solver/helper';
+import { NumField, PuyoField } from '../../solver/field';
+import { FieldState, Pos } from '../../solver';
+import { colorPop } from '../animation/color-pop';
+import { garbagePop } from '../animation/garbage-pop';
+import { getSplitGroups, getStaggerValues } from '../animation/popping-stagger';
 
 const shortBounce = ['h', '0', 'v', 'v', '0', '0', 'h', 'h', '0', 'v', 'v', '0', '0', '0'];
-
-/** Abstract class for the Puyo, Shadow, Arrow, Cursor, and Number fields */
-abstract class Layer extends StateContainer {
-  public rows: number;
-  public cols: number;
-  public hrows: number;
-  public cellWidth: number;
-  public cellHeight: number;
-  public cellPos: PositionMatrix;
-  public textures: PIXI.ITextureDictionary;
-  public sprites: PIXI.Sprite[];
-
-  constructor(fieldSettings: LayerSettings, textures: PIXI.ITextureDictionary) {
-    super();
-    this.rows = fieldSettings.rows;
-    this.cols = fieldSettings.cols;
-    this.hrows = fieldSettings.hrows;
-    this.cellWidth = fieldSettings.cellWidth;
-    this.cellHeight = fieldSettings.cellHeight;
-
-    this.textures = textures;
-    this.cellPos = new PositionMatrix(this.rows, this.cols, this.cellWidth, this.cellHeight);
-    this.sprites = [];
-
-    // Place empty sprites onto the field
-    this.init();
-  }
-
-  private init(): void {
-    // Initialize sprites
-    for (let r = 0; r < this.rows; r++) {
-      for (let c = 0; c < this.cols; c++) {
-        const i = r * this.cols + c;
-        this.sprites[i] = new PIXI.Sprite(this.textures[`none_0.png`]);
-        const sprite = this.sprites[i];
-
-        sprite.anchor.set(0.5);
-        const { x, y } = this.cellPos.get(r, c);
-        sprite.x = x;
-        sprite.y = y;
-        sprite.interactive = false;
-
-        this.addChild(sprite);
-      }
-    }
-  }
-
-  public abstract refreshSprites(field: PuyoField | BoolField | NumField): void;
-}
 
 class PuyoLayer extends Layer {
   private startingField: PuyoField;
@@ -84,9 +26,10 @@ class PuyoLayer extends Layer {
 
   public tempField: PuyoField;
   public runningPopAnimation: boolean; // Need to track this for the score display
+  public runningBurstAnimation: boolean; // Need to track this for garbage tray & chain counter
 
-  constructor(fieldSettings: LayerSettings, textures: PIXI.ITextureDictionary) {
-    super(fieldSettings, textures);
+  constructor(parent: StateContainer, fieldSettings: LayerSettings) {
+    super(parent, fieldSettings);
 
     this.dropDists = new NumField(fieldSettings.rows, fieldSettings.cols);
     this.connectivity = new NumField(fieldSettings.rows, fieldSettings.cols);
@@ -101,9 +44,29 @@ class PuyoLayer extends Layer {
     this.garbageAdjacency = [];
     this.dropFinishDelay = 0;
     this.runningPopAnimation = false;
+    this.runningBurstAnimation = false;
 
     // Set interaction handlers
     this.setEventHandlers();
+  }
+
+  public init(): void {
+    // Initialize sprites
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        const i = r * this.cols + c;
+        this.sprites[i] = new PIXI.Sprite(this.puyoTextures[`none_0.png`]);
+        const sprite = this.sprites[i];
+
+        sprite.anchor.set(0.5);
+        const { x, y } = this.cellPos.get(r, c);
+        sprite.x = x;
+        sprite.y = y;
+        sprite.interactive = false;
+
+        this.addChild(sprite);
+      }
+    }
   }
 
   public refreshSprites(field: PuyoField): void {
@@ -129,21 +92,21 @@ class PuyoLayer extends Layer {
 
         // If the cell isn't a Puyo, or is empty, just have to set its type + _0.png
         if (!isColored(puyo)) {
-          sprite.texture = this.textures[`${name}_0.png`];
+          sprite.texture = this.puyoTextures[`${name}_0.png`];
           continue;
         }
 
         // Now for the colored Puyos...
         // Don't need to set connections for Puyos in the hidden rows
         if (r < hrows) {
-          sprite.texture = this.textures[`${name}_0.png`];
+          sprite.texture = this.puyoTextures[`${name}_0.png`];
           continue;
         }
 
         // Don't need to set connections for Puyos that are dropping
         const dist = this.dropDists.get(r, c);
         if (dist > 0) {
-          sprite.texture = this.textures[`${name}_0.png`];
+          sprite.texture = this.puyoTextures[`${name}_0.png`];
           continue;
         }
 
@@ -160,7 +123,7 @@ class PuyoLayer extends Layer {
         // Update connectivity matrix
         this.connectivity.set(r, c, connection);
 
-        sprite.texture = this.textures[`${name}_${connection}.png`];
+        sprite.texture = this.puyoTextures[`${name}_${connection}.png`];
       }
     }
   }
@@ -263,7 +226,7 @@ class PuyoLayer extends Layer {
           const name = PUYONAME[puyo];
 
           if (isColored(this.startingField.get(r, c))) {
-            sprite.texture = this.textures[`${name}_${shortBounce[t]}.png`];
+            sprite.texture = this.puyoTextures[`${name}_${shortBounce[t]}.png`];
           }
           this.dropAnimationTickers.increment(r, c);
           continue;
@@ -280,7 +243,7 @@ class PuyoLayer extends Layer {
           // put the sprite that fell back to its original position, empty
           this.sprites[r * cols + c].x = this.cellPos.get(r, c).x;
           this.sprites[r * cols + c].y = this.cellPos.get(r, c).y;
-          this.sprites[r * cols + c].texture = this.textures['spacer_0.png'];
+          this.sprites[r * cols + c].texture = this.puyoTextures['spacer_0.png'];
           this.connectivity.set(r, c, 0);
 
           // If this was a colored Puyo, update the new puyo's connectivity, along with its neighbors.
@@ -293,7 +256,7 @@ class PuyoLayer extends Layer {
               const nConnection = this.connectivity.addAt(newR + 1, c, 2);
               const nPuyo = this.tempField.get(newR + 1, c);
               const nName = PUYONAME[nPuyo];
-              this.sprites[(newR + 1) * cols + c].texture = this.textures[`${nName}_${nConnection}.png`];
+              this.sprites[(newR + 1) * cols + c].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             // Check up
             if (newR > hrows && puyo === this.tempField.get(newR - 1, c)) {
@@ -301,7 +264,7 @@ class PuyoLayer extends Layer {
               const nConnection = this.connectivity.addAt(newR - 1, c, 1);
               const nPuyo = this.tempField.get(newR - 1, c);
               const nName = PUYONAME[nPuyo];
-              this.sprites[(newR - 1) * cols + c].texture = this.textures[`${nName}_${nConnection}.png`];
+              this.sprites[(newR - 1) * cols + c].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             // check right
             if (c < cols - 1 && puyo === this.tempField.get(newR, c + 1)) {
@@ -309,7 +272,7 @@ class PuyoLayer extends Layer {
               const nConnection = this.connectivity.addAt(newR, c + 1, 8);
               const nPuyo = this.tempField.get(newR, c + 1);
               const nName = PUYONAME[nPuyo];
-              this.sprites[newR * cols + c + 1].texture = this.textures[`${nName}_${nConnection}.png`];
+              this.sprites[newR * cols + c + 1].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             // check left
             if (c > 0 && puyo === this.tempField.get(newR, c - 1)) {
@@ -317,12 +280,12 @@ class PuyoLayer extends Layer {
               const nConnection = this.connectivity.addAt(newR, c - 1, 4);
               const nPuyo = this.tempField.get(newR, c - 1);
               const nName = PUYONAME[nPuyo];
-              this.sprites[newR * cols + c - 1].texture = this.textures[`${nName}_${nConnection}.png`];
+              this.sprites[newR * cols + c - 1].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
-            this.sprites[newR * cols + c].texture = this.textures[`${PUYONAME[puyo]}_${connection}.png`];
+            this.sprites[newR * cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_${connection}.png`];
             this.connectivity.set(newR, c, connection);
           } else {
-            this.sprites[newR * cols + c].texture = this.textures[`${PUYONAME[puyo]}_0.png`];
+            this.sprites[newR * cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_0.png`];
             this.connectivity.set(newR, c, 0);
           }
 
@@ -375,7 +338,7 @@ class PuyoLayer extends Layer {
         const color = this.tempField.get(r, c);
         const sprite = this.sprites[r * this.cols + c];
         const stagger = this.poppingStagger[g][h];
-        const finished = colorPop(sprite, color, this.popAnimationTicker, stagger, this.textures);
+        const finished = colorPop(sprite, color, this.popAnimationTicker, stagger, this.puyoTextures);
         popState.push(finished);
       }
     }
@@ -386,12 +349,13 @@ class PuyoLayer extends Layer {
       const color = this.tempField.get(r, c);
       const sprite = this.sprites[r * this.cols + c];
       const adjValue = this.garbageAdjacency[i];
-      const finished = garbagePop(sprite, color, adjValue, this.popAnimationTicker, this.textures);
+      const finished = garbagePop(sprite, color, adjValue, this.popAnimationTicker, this.puyoTextures);
       garbageState.push(finished);
     }
 
     if (popState.every((s) => s) && garbageState.every((s) => s)) {
       this.runningPopAnimation = false;
+      this.runningBurstAnimation = false;
 
       // Colored Puyos:
       for (let g = 0; g < this.poppingGroups.length; g++) {
@@ -417,6 +381,7 @@ class PuyoLayer extends Layer {
       return true;
     } else {
       this.runningPopAnimation = this.popAnimationTicker >= 8;
+      this.runningBurstAnimation = this.popAnimationTicker >= 39;
     }
 
     this.popAnimationTicker += 1;
@@ -429,4 +394,4 @@ class PuyoLayer extends Layer {
   }
 }
 
-export { Layer, LayerSettings, PuyoLayer };
+export { PuyoLayer };

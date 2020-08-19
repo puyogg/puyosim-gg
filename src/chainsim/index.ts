@@ -5,6 +5,7 @@ import { ASSET_PATH } from './constants';
 import { Frame } from './frame';
 import { ScoreDisplay } from './score';
 import { GarbageTray } from './garbage-tray';
+import { ChainCounter } from './chain-counter';
 import { PuyoField } from '../solver/field';
 import { FieldState } from '../solver';
 
@@ -36,6 +37,7 @@ class Chainsim {
   private frame: Frame | undefined;
   private scoreDisplay: ScoreDisplay | undefined;
   private garbageTray: GarbageTray | undefined;
+  private chainCounter: ChainCounter | undefined;
 
   // Function that plays on every tick. Swap it out with other methods.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,7 +102,6 @@ class Chainsim {
     this.scoreDisplay = new ScoreDisplay(this.root, this.frame.puyoLayer, this);
     this.scoreDisplay.x = 32;
     this.scoreDisplay.y = 935;
-    // Let the score display update itself
     this.app.ticker.add(() => this.scoreDisplay?.update());
 
     this.garbageTray = new GarbageTray(this.root, this.frame.puyoLayer, this);
@@ -108,6 +109,11 @@ class Chainsim {
     this.garbageTray.y = 915;
     this.garbageTray.scale.set(0.7, 0.7);
     this.app.ticker.add((delta: number) => this.garbageTray?.update(delta));
+
+    this.chainCounter = new ChainCounter(this.root, this.frame.puyoLayer, this);
+    this.chainCounter.x = 432;
+    this.chainCounter.y = 836;
+    this.app.ticker.add((delta: number) => this.chainCounter?.update(delta));
 
     this.animationState = this.idle;
 
@@ -136,8 +142,6 @@ class Chainsim {
       this.state.solver.simulate();
       this.state.solverStep = 0;
     }
-
-    console.log(this.state.solver);
 
     // Decide whether we're gonna animate drops or pops.
     // Run the preparation methods.

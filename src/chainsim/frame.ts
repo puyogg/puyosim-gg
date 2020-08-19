@@ -1,5 +1,5 @@
 import { StateContainer } from './container';
-import { LayerSettings, PuyoLayer } from './layer';
+import { LayerSettings, PuyoLayer } from './field-layer';
 import { ASSET_PATH } from './constants';
 import { Sprite } from 'pixi.js';
 
@@ -14,7 +14,6 @@ class Frame extends StateContainer {
     this.initBorders();
 
     // Lay out the Puyo Layer
-    const puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
     const fieldSettings: LayerSettings = {
       rows: this.state.simSettings.rows,
       hrows: this.state.simSettings.hrows,
@@ -23,7 +22,7 @@ class Frame extends StateContainer {
       cellHeight: this.state.pxSizing.cellHeight,
     };
 
-    this.puyoLayer = new PuyoLayer(fieldSettings, puyoTextures);
+    this.puyoLayer = new PuyoLayer(this, fieldSettings);
     this.addChild(this.puyoLayer); // Needs to be a child to receive root state data.
     this.puyoLayer.refreshSprites(this.state.slides[0].puyo);
     this.puyoLayer.x = 25;

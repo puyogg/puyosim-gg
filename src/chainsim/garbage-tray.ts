@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { ASSET_PATH } from './constants';
 import { Chainsim } from '.';
-import { PuyoLayer } from './layer';
+import { PuyoLayer } from './field-layer';
 import { countGarbageIcons } from './math/count-garbage-icons';
 
 class GarbageTray extends StateContainer {
@@ -41,7 +41,6 @@ class GarbageTray extends StateContainer {
     this.icons = [];
     this.targetCoords = [];
     const xo = 10;
-    console.log(this.puyoTextures);
     for (let i = 0; i < 6; i++) {
       this.icons[i] = new Sprite(this.puyoTextures['spacer_0.png']);
       this.addChild(this.icons[i]);
@@ -49,15 +48,14 @@ class GarbageTray extends StateContainer {
       this.targetCoords[i] = xo + this.icons[i].width * i;
       this.icons[i].y = -6;
     }
-    console.log(this.targetCoords);
+
     // Initialize garbage count numbers
     this.numbers = [];
     for (let i = 0; i < 8; i++) {
       this.numbers[i] = new Sprite(this.numTextures['score_0.png']);
-      this.numbers[i].scale.set(0.8, 0.8);
       this.numbers[i].anchor.set(0.5);
       this.numbers[i].x = 120 + this.numbers[i].width * 0.9 * i;
-      this.numbers[i].y = 28;
+      this.numbers[i].y = 24;
       this.numbers[i].visible = false;
       this.numbers[i].alpha = 0;
       this.addChild(this.numbers[i]);
@@ -81,11 +79,10 @@ class GarbageTray extends StateContainer {
     this.setVisibility();
 
     const showGarbageUpdate = this.count !== this.state.solver.states[this.state.solverStep].garbage;
-    const puyoLayerPopping = this.puyoLayer.runningPopAnimation;
+    const puyoLayerBursting = this.puyoLayer.runningBurstAnimation;
     const correctState = this.chainsim.animationState === this.chainsim.animatePops;
 
-    if (puyoLayerPopping && correctState && showGarbageUpdate) {
-      console.log("Let's go?");
+    if (puyoLayerBursting && correctState && showGarbageUpdate) {
       this.count = this.state.solver.states[this.state.solverStep].garbage;
       this.prepGarbageAnimation();
       this.setNumbers();
@@ -110,9 +107,8 @@ class GarbageTray extends StateContainer {
     });
 
     const iconNames = countGarbageIcons(this.count);
-    console.log(iconNames);
     const centerX = (this.icons[2].x + this.icons[3].x) / 2;
-    console.log(centerX);
+
     for (let i = 0; i < iconNames.length; i++) {
       this.icons[i].texture = this.puyoTextures[iconNames[i]];
       this.icons[i].alpha = 1;
@@ -123,7 +119,7 @@ class GarbageTray extends StateContainer {
 
   private setNumbers(): void {
     const countText = this.count.toString();
-    console.log(countText);
+
     for (let i = 0; i < this.numbers.length; i++) {
       if (i >= countText.length) {
         this.numbers[i].alpha = 0;
