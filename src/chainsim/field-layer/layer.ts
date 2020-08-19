@@ -15,6 +15,7 @@ abstract class Layer extends SimContainer {
   public cellPos: PositionMatrix;
   public puyoTextures: PIXI.ITextureDictionary;
   public toolTextures: PIXI.ITextureDictionary;
+  public numberTextures: PIXI.ITextureDictionary;
   public sprites: PIXI.Sprite[];
 
   /** Remember to call init at the end of the extended class's constructor function. */
@@ -27,6 +28,7 @@ abstract class Layer extends SimContainer {
     this.cellHeight = this.chainsim.state.pxSizing.cellHeight;
     this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
     this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
+    this.numberTextures = this.resources[`${ASSET_PATH}/scoreFont.json`].textures as PIXI.ITextureDictionary;
     this.cellPos = new PositionMatrix(this.rows, this.cols, this.cellWidth, this.cellHeight);
     this.sprites = [];
   }
@@ -34,6 +36,13 @@ abstract class Layer extends SimContainer {
   public abstract init(): void;
 
   public abstract refreshSprites(field: PuyoField | BoolField | NumField): void;
+
+  /** Set the interaction value for all the sprites */
+  public setInteraction(bool: boolean): void {
+    this.sprites.forEach((sprite) => {
+      sprite.interactive = bool;
+    });
+  }
 }
 
 export { Layer };

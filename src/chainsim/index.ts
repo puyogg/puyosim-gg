@@ -5,6 +5,7 @@ import { Frame } from './frame';
 import { ScoreDisplay } from './score';
 import { GarbageTray } from './garbage-tray';
 import { ChainCounter } from './chain-counter';
+import { Toolbox } from './toolbox';
 
 /** Subset of options available at https://pixijs.download/v5.3.3/docs/PIXI.Application.html */
 interface PixiOptions {
@@ -30,9 +31,13 @@ class Chainsim {
   public state: AppState;
   public resources: PIXI.IResourceDictionary;
 
+  // Field
   private frame: Frame | undefined;
   private scoreDisplay: ScoreDisplay | undefined;
   private garbageTray: GarbageTray | undefined;
+
+  // Toolbox
+  private toolbox: Toolbox | undefined;
   private chainCounter: ChainCounter | undefined;
 
   // Function that plays on every tick. Swap it out with other methods.
@@ -87,10 +92,15 @@ class Chainsim {
     graphics.endFill();
     this.app.stage.addChild(graphics);
 
+    //// FIELD ////
     this.frame = new Frame(this);
     this.frame.x = 0;
     this.frame.y = 132;
     this.app.stage.addChild(this.frame);
+    this.app.ticker.add((delta: number) => this.frame?.shadowLayer.update(delta));
+    this.app.ticker.add((delta: number) => this.frame?.arrowLayer.update(delta));
+    this.app.ticker.add((delta: number) => this.frame?.cursorLayer.update(delta));
+    this.app.ticker.add((delta: number) => this.frame?.numberLayer.update(delta));
 
     this.scoreDisplay = new ScoreDisplay(this, this.frame.puyoLayer);
     this.scoreDisplay.x = 32;
@@ -104,12 +114,21 @@ class Chainsim {
     this.garbageTray.scale.set(0.7, 0.7);
     this.app.stage.addChild(this.garbageTray);
     this.app.ticker.add((delta: number) => this.garbageTray?.update(delta));
+    ///////////////
 
+    //// TOOLBOX ////
+    this.toolbox = new Toolbox(this);
+    this.toolbox.position.set(438, 548);
+    this.app.stage.addChild(this.toolbox);
+    /////////////////
+
+    //// CHAIN COUNTER ////
     this.chainCounter = new ChainCounter(this, this.frame.puyoLayer);
     this.chainCounter.x = 432;
     this.chainCounter.y = 836;
     this.app.stage.addChild(this.chainCounter);
     this.app.ticker.add((delta: number) => this.chainCounter?.update(delta));
+    ///////////////////////
 
     this.animationState = this.idle;
 

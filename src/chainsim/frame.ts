@@ -1,12 +1,19 @@
+import { PUYOTYPE } from '../solver/constants';
 import { SimContainer } from './container';
-import { PuyoLayer } from './field-layer';
+import { PuyoLayer, ShadowLayer, ArrowLayer, CursorLayer, NumberLayer } from './field-layer';
 import { ASSET_PATH } from './constants';
+import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { Chainsim } from '.';
 
-/** The field frame, along with the character background */
+/** The field frame. Contains the borders, background, and field layers.*/
 class Frame extends SimContainer {
+  public layerContainer: PIXI.Container;
   public puyoLayer: PuyoLayer;
+  public shadowLayer: ShadowLayer;
+  public arrowLayer: ArrowLayer;
+  public cursorLayer: CursorLayer;
+  public numberLayer: NumberLayer;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
@@ -14,10 +21,35 @@ class Frame extends SimContainer {
     this.initCharBG();
     this.initBorders();
 
+    this.layerContainer = new PIXI.Container();
+    this.layerContainer.x = 25;
+    this.layerContainer.y = -8;
+    this.addChild(this.layerContainer);
+
+    this.chainsim.state.slides[0].shadow.data.fill(PUYOTYPE.GARBAGE); // Test
+    this.shadowLayer = new ShadowLayer(chainsim);
+    this.layerContainer.addChild(this.shadowLayer);
+
     this.puyoLayer = new PuyoLayer(chainsim);
-    this.addChild(this.puyoLayer);
-    this.puyoLayer.x = 25;
-    this.puyoLayer.y = -8;
+    this.layerContainer.addChild(this.puyoLayer);
+
+    for (let i = 0; i < this.chainsim.state.slides[0].arrow.data.length; i++) {
+      this.chainsim.state.slides[0].arrow.data[i] = Math.floor(Math.random() * 4) + 1;
+    }
+    this.arrowLayer = new ArrowLayer(chainsim);
+    this.layerContainer.addChild(this.arrowLayer);
+
+    for (let i = 0; i < this.chainsim.state.slides[0].cursor.data.length; i++) {
+      this.chainsim.state.slides[0].cursor.data[i] = Math.round(Math.random()) === 0;
+    }
+    this.cursorLayer = new CursorLayer(chainsim);
+    this.layerContainer.addChild(this.cursorLayer);
+
+    for (let i = 0; i < this.chainsim.state.slides[0].number.data.length; i++) {
+      this.chainsim.state.slides[0].number.data[i] = Math.floor(Math.random() * 100);
+    }
+    this.numberLayer = new NumberLayer(chainsim);
+    this.layerContainer.addChild(this.numberLayer);
   }
 
   public update(delta: number): void {
