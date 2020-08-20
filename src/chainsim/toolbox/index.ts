@@ -3,9 +3,10 @@ import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
-import { Button } from './button';
 import { SimTools } from './sim';
 import { EditingTools } from './edit';
+import { Switch } from './switch';
+import { Frame } from '../frame';
 
 class Toolbox extends SimContainer {
   private layoutTextures: PIXI.ITextureDictionary;
@@ -14,8 +15,8 @@ class Toolbox extends SimContainer {
   private simTools: SimTools;
   private editingTools: EditingTools;
 
-  private simToolsBtn: Button;
-  private editToolsBtn: Button;
+  private simToolsBtn: Switch;
+  private editToolsBtn: Switch;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
@@ -26,26 +27,37 @@ class Toolbox extends SimContainer {
     this.addChild(toolbox);
     console.log(toolbox.width, toolbox.height);
 
-    this.simToolsBtn = new Button(this.toolboxTextures['btn_sim.png']);
-    this.simToolsBtn.pressed = this.toolboxTextures['btn_sim_pressed.png'];
+    this.simToolsBtn = new Switch(this.toolboxTextures['btn_sim.png'], this.toolboxTextures['btn_sim_pressed.png']);
+    this.simToolsBtn.down = true;
     this.simToolsBtn.anchor.set(0.5);
     this.simToolsBtn.position.set(56, -36);
+    this.simToolsBtn.on('pointerdown', () => {
+      this.simTools.visible = true;
+      this.editingTools.visible = false;
+      this.editToolsBtn.down = false;
+      (this.chainsim.frame as Frame).editLayer.interactive = false;
+      // May need to do other things, like reset the chain state...
+    });
     this.addChild(this.simToolsBtn);
 
-    this.editToolsBtn = new Button(this.toolboxTextures['btn_edit.png']);
-    this.editToolsBtn.pressed = this.toolboxTextures['btn_edit_pressed.png'];
+    this.editToolsBtn = new Switch(this.toolboxTextures['btn_edit.png'], this.toolboxTextures['btn_edit_pressed.png']);
     this.editToolsBtn.anchor.set(0.5);
     this.editToolsBtn.position.set(136, -36);
+    this.editToolsBtn.on('pointerdown', () => {
+      this.simTools.visible = false;
+      this.editingTools.visible = true;
+      this.simToolsBtn.down = false;
+      (this.chainsim.frame as Frame).editLayer.interactive = true;
+    });
     this.addChild(this.editToolsBtn);
 
     this.simTools = new SimTools(chainsim);
     this.simTools.position.set(56, 72);
-    this.simTools.visible = false;
     this.addChild(this.simTools);
 
     this.editingTools = new EditingTools(chainsim);
-    // this.editingTools.position.set(34, 34);
     this.editingTools.scale.set(0.8);
+    this.editingTools.visible = false;
     this.addChild(this.editingTools);
   }
 }

@@ -1,8 +1,6 @@
 import { Page } from './page';
 import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
-import { Sprite } from 'pixi.js';
-import { Button } from './button';
 import { PUYOTYPE } from '../../solver/constants';
 import { ToolSprite } from './tool';
 

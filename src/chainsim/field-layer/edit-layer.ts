@@ -34,7 +34,8 @@ export class EditLayer extends SimContainer {
     this.row = 0;
     this.col = 0;
 
-    this.interactive = true;
+    this.interactive = false;
+
     this.on('pointerover', () => (this.pointerOver = true));
     this.on('pointerdown', (event: PIXI.InteractionEvent) => {
       if (this.chainsim.animationState === this.chainsim.idle) {

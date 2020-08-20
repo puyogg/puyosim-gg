@@ -29,19 +29,11 @@ export class EditingTools extends SimContainer {
     this.toolboxTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
     this.pageMain = new PageMain(chainsim);
-    this.addChild(this.pageMain);
-
     this.pageShadow = new PageShadow(chainsim);
-    this.addChild(this.pageShadow);
-
     this.pageArrow = new PageArrow(chainsim);
-    this.addChild(this.pageArrow);
-
     this.pageCursor = new PageCursor(chainsim);
-    this.addChild(this.pageCursor);
-
     this.pageNumber = new PageNumber(chainsim);
-    this.addChild(this.pageNumber);
+    this.addChild(this.pageMain, this.pageShadow, this.pageArrow, this.pageCursor, this.pageNumber);
 
     this.pages = [this.pageMain, this.pageShadow, this.pageArrow, this.pageCursor, this.pageNumber];
     this.simState.currentLayer = 0;

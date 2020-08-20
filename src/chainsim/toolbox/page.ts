@@ -38,8 +38,10 @@ export abstract class Page extends SimContainer {
     this.addChild(this.delete);
 
     // Clear Layer
-    this.clearLayer = new Button(this.toolboxTextures['btn_clearLayer.png']);
-    this.clearLayer.pressed = this.toolboxTextures['btn_clearLayer_pressed.png'];
+    this.clearLayer = new Button(
+      this.toolboxTextures['btn_clearLayer.png'],
+      this.toolboxTextures['btn_clearLayer_pressed.png'],
+    );
     this.clearLayer.anchor.set(0.5);
     this.clearLayer.position.set(160, 48);
     this.addChild(this.clearLayer);
