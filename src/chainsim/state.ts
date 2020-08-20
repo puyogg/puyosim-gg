@@ -45,6 +45,7 @@ class AppState {
 
   // Editor
   public currentTool: PUYOTYPE | number | boolean;
+  public currentLayer: number;
 
   // Track placement history, slideshow position
   public slides: FieldData[];
@@ -76,6 +77,7 @@ class AppState {
     };
 
     this.currentTool = 0;
+    this.currentLayer = 0;
 
     // This should get overwritten by any incoming states.
     this.slides = [];

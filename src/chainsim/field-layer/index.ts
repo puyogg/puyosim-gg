@@ -4,5 +4,6 @@ import { ShadowLayer } from './shadow-layer';
 import { ArrowLayer } from './arrow-layer';
 import { CursorLayer } from './cursor-layer';
 import { NumberLayer } from './number-layer';
+import { EditLayer } from './edit-layer';
 
-export { Layer, PuyoLayer, ShadowLayer, ArrowLayer, CursorLayer, NumberLayer };
+export { Layer, PuyoLayer, ShadowLayer, ArrowLayer, CursorLayer, NumberLayer, EditLayer };

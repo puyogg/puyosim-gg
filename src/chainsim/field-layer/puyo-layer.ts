@@ -56,7 +56,7 @@ class PuyoLayer extends Layer {
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
         const i = r * this.cols + c;
-        this.sprites[i] = new PIXI.Sprite(this.puyoTextures[`none_0.png`]);
+        this.sprites[i] = new PIXI.Sprite(this.puyoTextures[`spacer_0.png`]);
         const sprite = this.sprites[i];
 
         sprite.anchor.set(0.5);

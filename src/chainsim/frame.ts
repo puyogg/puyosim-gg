@@ -1,6 +1,6 @@
 import { PUYOTYPE } from '../solver/constants';
 import { SimContainer } from './container';
-import { PuyoLayer, ShadowLayer, ArrowLayer, CursorLayer, NumberLayer } from './field-layer';
+import { PuyoLayer, ShadowLayer, ArrowLayer, CursorLayer, NumberLayer, Layer, EditLayer } from './field-layer';
 import { ASSET_PATH } from './constants';
 import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
@@ -14,6 +14,8 @@ class Frame extends SimContainer {
   public arrowLayer: ArrowLayer;
   public cursorLayer: CursorLayer;
   public numberLayer: NumberLayer;
+  public editLayer: EditLayer;
+  public layers: Layer[];
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
@@ -50,10 +52,19 @@ class Frame extends SimContainer {
     }
     this.numberLayer = new NumberLayer(chainsim);
     this.layerContainer.addChild(this.numberLayer);
+
+    this.layers = [this.puyoLayer, this.shadowLayer, this.arrowLayer, this.cursorLayer, this.numberLayer];
+
+    // Editor layer
+    this.editLayer = new EditLayer(chainsim, this.layers);
+    this.layerContainer.addChild(this.editLayer);
   }
 
   public update(delta: number): void {
-    delta;
+    this.shadowLayer.update(delta);
+    this.arrowLayer.update(delta);
+    this.cursorLayer.update(delta);
+    this.numberLayer.update(delta);
   }
 
   private initCharBG(): void {

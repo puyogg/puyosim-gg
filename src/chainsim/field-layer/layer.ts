@@ -4,6 +4,7 @@ import { PositionMatrix } from '../position';
 import { NumField, PuyoField, BoolField } from '../../solver/field';
 import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
+import { PUYOTYPE } from '~/solver/constants';
 
 /** Abstract class for the Puyo, Shadow, Arrow, Cursor, and Number fields */
 abstract class Layer extends SimContainer {
@@ -41,6 +42,7 @@ abstract class Layer extends SimContainer {
   public setInteraction(bool: boolean): void {
     this.sprites.forEach((sprite) => {
       sprite.interactive = bool;
+      sprite.buttonMode = bool;
     });
   }
 }

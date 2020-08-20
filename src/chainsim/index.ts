@@ -32,7 +32,7 @@ class Chainsim {
   public resources: PIXI.IResourceDictionary;
 
   // Field
-  private frame: Frame | undefined;
+  public frame: Frame | undefined;
   private scoreDisplay: ScoreDisplay | undefined;
   private garbageTray: GarbageTray | undefined;
 
@@ -97,10 +97,7 @@ class Chainsim {
     this.frame.x = 0;
     this.frame.y = 132;
     this.app.stage.addChild(this.frame);
-    this.app.ticker.add((delta: number) => this.frame?.shadowLayer.update(delta));
-    this.app.ticker.add((delta: number) => this.frame?.arrowLayer.update(delta));
-    this.app.ticker.add((delta: number) => this.frame?.cursorLayer.update(delta));
-    this.app.ticker.add((delta: number) => this.frame?.numberLayer.update(delta));
+    this.app.ticker.add((delta: number) => this.frame?.update(delta));
 
     this.scoreDisplay = new ScoreDisplay(this, this.frame.puyoLayer);
     this.scoreDisplay.x = 32;
@@ -144,7 +141,7 @@ class Chainsim {
 
   /** Chain solver inactive, no other actions */
   public idle(delta: number): void {
-    this.frame?.update(delta);
+    //
   }
 
   /** Simulate a step. This function assumes the previous state was this.idle() */

@@ -25,6 +25,8 @@ export class PageMain extends Page {
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
+    this.name = 'main';
+
     this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
 
     this.puyoTools = [];
@@ -45,6 +47,10 @@ export class PageMain extends Page {
     }
 
     this.setListeners();
+  }
+
+  public setCurrent(): void {
+    this.simState.currentTool = this.currentTool;
   }
 
   public setListeners(): void {

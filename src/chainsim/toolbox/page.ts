@@ -17,6 +17,7 @@ export abstract class Page extends SimContainer {
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
+
     this.currentTool = 0;
     this.toolboxTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
@@ -43,4 +44,6 @@ export abstract class Page extends SimContainer {
     this.clearLayer.position.set(160, 48);
     this.addChild(this.clearLayer);
   }
+
+  public abstract setCurrent(): void;
 }

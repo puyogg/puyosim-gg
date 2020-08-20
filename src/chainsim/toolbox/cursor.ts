@@ -1,8 +1,5 @@
 import { Page } from './page';
-import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
-import { Sprite } from 'pixi.js';
-import { Button } from './button';
 import { ToolSprite } from './tool';
 
 export class PageCursor extends Page {
@@ -10,6 +7,8 @@ export class PageCursor extends Page {
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
+
+    this.name = 'cursor';
 
     const texture = this.toolboxTextures[`cursor.png`];
     this.tool = new ToolSprite(texture, this.toolCursor, true, this, this.simState);
@@ -19,6 +18,10 @@ export class PageCursor extends Page {
     this.addChild(this.tool);
 
     this.setListeners();
+  }
+
+  public setCurrent(): void {
+    this.simState.currentTool = this.currentTool;
   }
 
   public setListeners(): void {

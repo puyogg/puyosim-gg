@@ -1,8 +1,5 @@
 import { Page } from './page';
-import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
-import { Sprite } from 'pixi.js';
-import { Button } from './button';
 import { ToolSprite } from './tool';
 
 const angles: number[][] = [[0, (1 / 2) * Math.PI, Math.PI], [(3 / 2) * Math.PI]];
@@ -14,6 +11,8 @@ export class PageArrow extends Page {
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
+
+    this.name = 'arrow';
 
     this.arrowTools = [];
     for (let r = 0; r < angles.length; r++) {
@@ -34,6 +33,10 @@ export class PageArrow extends Page {
     }
 
     this.setListeners();
+  }
+
+  public setCurrent(): void {
+    this.simState.currentTool = this.currentTool;
   }
 
   public setListeners(): void {

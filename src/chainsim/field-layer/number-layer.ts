@@ -58,7 +58,10 @@ class NumberLayer extends Layer {
         const second = num.children[1] as Sprite;
         const value = field.get(r, c);
 
-        if (value < 10) {
+        if (value === 0) {
+          first.visible = false;
+          second.visible = false;
+        } else if (value < 10) {
           first.visible = true;
           second.visible = false;
           first.x = 0;

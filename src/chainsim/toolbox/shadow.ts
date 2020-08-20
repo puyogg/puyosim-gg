@@ -4,7 +4,7 @@ import { Chainsim } from '..';
 export class PageShadow extends PageMain {
   constructor(chainsim: Chainsim) {
     super(chainsim);
-
+    this.name = 'shadow';
     this.tools.forEach((tool) => (tool.alpha = 0.5));
   }
 
