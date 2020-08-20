@@ -43,6 +43,9 @@ class AppState {
   public simSettings: SimulatorSettings;
   public pxSizing: PixelSizing;
 
+  // Editor
+  public currentTool: PUYOTYPE | number | boolean;
+
   // Track placement history, slideshow position
   public slides: FieldData[];
   public slidePos: number;
@@ -71,6 +74,8 @@ class AppState {
       cellWidth: 64,
       cellHeight: 60,
     };
+
+    this.currentTool = 0;
 
     // This should get overwritten by any incoming states.
     this.slides = [];

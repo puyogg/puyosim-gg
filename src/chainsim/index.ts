@@ -218,7 +218,7 @@ class Chainsim {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private chainPaused(delta: number) {
     // Similar to idle, but editor functions should be disabled.
-    console.log('Chain finished.');
+    // console.log('Chain finished.');
   }
 
   public mountGame(el: HTMLElement): void {

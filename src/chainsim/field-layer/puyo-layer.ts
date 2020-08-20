@@ -81,6 +81,12 @@ class PuyoLayer extends Layer {
         const puyo = field.get(r, c);
         const name = PUYONAME[puyo];
         const sprite = this.sprites[r * this.cols + c];
+        // sprite.addListener('pointerdown', () => console.log('one'));
+        // sprite.addListener('pointerdown', () => console.log('two'));
+        sprite.on('pointerdown', () => console.log('yeah?'));
+        sprite.on('pointerdown', () => console.log('hm'));
+        sprite.removeAllListeners();
+        sprite.interactive = true;
 
         // Update the x, y, connectivity, alpha back to normal.
         sprite.x = this.cellPos.get(r, c).x;

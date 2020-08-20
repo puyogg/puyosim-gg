@@ -434,11 +434,11 @@
 },
 "current_tool.png":
 {
-	"frame": {"x":272,"y":0,"w":64,"h":60},
+	"frame": {"x":272,"y":0,"w":63,"h":60},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":60},
-	"sourceSize": {"w":64,"h":60}
+	"spriteSourceSize": {"x":0,"y":0,"w":63,"h":60},
+	"sourceSize": {"w":63,"h":60}
 },
 "cursor.png":
 {
