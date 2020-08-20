@@ -67,7 +67,7 @@ export class PageNumber extends Page {
   }
 
   public setCurrent(): void {
-    this.simState.currentTool = this.currentTool;
+    this.editLayer.currentTool = this.currentTool;
 
     if (this.currentTool === 0) {
       this.toolCursor.x = this.delete.x;
@@ -85,7 +85,7 @@ export class PageNumber extends Page {
     this.displayNum = (this.displayNum + 1) % 100;
     this.displayNum = this.displayNum === 0 ? 1 : this.displayNum;
     this.currentTool = this.displayNum;
-    this.simState.currentTool = this.currentTool;
+    this.editLayer.currentTool = this.currentTool;
 
     // Update sprites and cursor position
     this.toolCursor.x = this.numContainer.x;
@@ -98,7 +98,7 @@ export class PageNumber extends Page {
     this.displayNum = this.displayNum - 1;
     this.displayNum = this.displayNum === 0 ? 99 : this.displayNum;
     this.currentTool = this.displayNum;
-    this.simState.currentTool = this.currentTool;
+    this.editLayer.currentTool = this.currentTool;
 
     // Update sprites and cursor position
     this.toolCursor.x = this.numContainer.x;

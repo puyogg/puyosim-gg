@@ -41,11 +41,61 @@ class SimTools extends SimContainer {
     this.btnStep = new Button(this.toolboxTextures['btn_step.png'], this.toolboxTextures['btn_step_pressed.png']);
     this.btnStep.anchor.set(0.5);
     this.btnStep.position.set(0, 144);
+    this.btnStep.on('pointerdown', () => {
+      if (this.chainsim.animationState === this.chainsim.idle) {
+        this.simState.autoStep = false;
+        this.simState.simSpeed = 1;
+        this.chainsim.startSimulation();
+        return;
+      }
+
+      if (this.chainsim.animationState === this.chainsim.chainPaused) {
+        this.simState.autoStep = false;
+        this.simState.simSpeed = 1;
+        this.chainsim.continueSimulation();
+        return;
+      }
+
+      if (
+        this.chainsim.animationState === this.chainsim.animatePops ||
+        this.chainsim.animationState === this.chainsim.animateChainDrops
+      ) {
+        this.simState.solverStep += 1;
+        this.simState.simSpeed = 1;
+        this.chainsim.animationState = this.chainsim.chainPaused;
+        const puyoField = this.simState.solver.states[this.simState.solverStep].puyoField;
+        this.chainsim.frame?.puyoLayer.refreshSprites(puyoField);
+        return;
+      }
+    });
     this.addChild(this.btnStep);
 
     this.btnPlay = new Button(this.toolboxTextures['btn_play.png'], this.toolboxTextures['btn_play_pressed.png']);
     this.btnPlay.anchor.set(0.5);
     this.btnPlay.position.set(79, 144);
+    this.btnPlay.on('pointerdown', () => {
+      if (this.chainsim.animationState === this.chainsim.idle) {
+        this.simState.autoStep = true;
+        this.simState.simSpeed = 1;
+        this.chainsim.startSimulation();
+        return;
+      }
+
+      if (this.chainsim.animationState === this.chainsim.chainPaused) {
+        this.simState.autoStep = true;
+        this.simState.simSpeed = 1;
+        this.chainsim.continueSimulation();
+        return;
+      }
+
+      if (
+        this.chainsim.animationState === this.chainsim.animatePops ||
+        this.chainsim.animationState === this.chainsim.animateChainDrops
+      ) {
+        this.simState.simSpeed *= 2;
+        return;
+      }
+    });
     this.addChild(this.btnPlay);
   }
 }

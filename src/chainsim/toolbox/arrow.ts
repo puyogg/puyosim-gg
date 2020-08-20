@@ -21,7 +21,7 @@ export class PageArrow extends Page {
         const angle = angles[r][c];
         const value = toolValue[r][c];
         const texture = this.toolboxTextures[`arrow.png`];
-        const tool = new ToolSprite(texture, this.toolCursor, value, this, this.simState);
+        const tool = new ToolSprite(texture, this.toolCursor, value, this, this.editLayer);
         tool.anchor.set(0.5);
         tool.x = 48 + 71 * c;
         tool.y = 120 + 71 * r;
@@ -36,7 +36,7 @@ export class PageArrow extends Page {
   }
 
   public setCurrent(): void {
-    this.simState.currentTool = this.currentTool;
+    this.editLayer.currentTool = this.currentTool;
   }
 
   public setListeners(): void {

@@ -43,10 +43,6 @@ class AppState {
   public simSettings: SimulatorSettings;
   public pxSizing: PixelSizing;
 
-  // Editor
-  public currentTool: PUYOTYPE | number | boolean;
-  public currentLayer: number;
-
   // Track placement history, slideshow position
   public slides: FieldData[];
   public slidePos: number;
@@ -57,6 +53,7 @@ class AppState {
 
   // Animation controls
   public autoStep: boolean; // Pause simulation after each pop or drop
+  public simSpeed: number;
 
   // Puyo movement
   public puyoMovement: PuyoMovement;
@@ -76,9 +73,6 @@ class AppState {
       cellHeight: 60,
     };
 
-    this.currentTool = 0;
-    this.currentLayer = 0;
-
     // This should get overwritten by any incoming states.
     this.slides = [];
     this.initSlides(x);
@@ -91,6 +85,7 @@ class AppState {
 
     // Animation controls
     this.autoStep = true;
+    this.simSpeed = 1;
 
     // Puyo Movement
     this.puyoMovement = {

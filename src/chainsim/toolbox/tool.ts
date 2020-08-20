@@ -1,8 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { Sprite, Container } from 'pixi.js';
-import { AppState } from '../state';
 import { PUYOTYPE } from '~/solver/constants';
 import { Page } from './page';
+import { EditLayer } from '../field-layer';
 
 export class ToolSprite extends Sprite {
   private toolValue: PUYOTYPE | number | boolean;
@@ -12,7 +12,7 @@ export class ToolSprite extends Sprite {
     toolCursor: Sprite,
     toolValue: PUYOTYPE | number | boolean,
     page: Page,
-    simState: AppState,
+    editLayer: EditLayer,
   ) {
     super(texture);
 
@@ -23,7 +23,7 @@ export class ToolSprite extends Sprite {
       toolCursor.x = this.x;
       toolCursor.y = this.y;
       page.currentTool = this.toolValue;
-      simState.currentTool = this.toolValue;
+      editLayer.currentTool = this.toolValue;
     });
   }
 }

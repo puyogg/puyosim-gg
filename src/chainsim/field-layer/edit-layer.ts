@@ -4,6 +4,7 @@ import { Graphics } from 'pixi.js';
 import { Layer } from './layer';
 import { Chainsim } from '..';
 import { PuyoField, BoolField, NumField } from '../../solver/field';
+import { PUYOTYPE } from '../../solver/constants';
 
 export class EditLayer extends SimContainer {
   private rect: Graphics;
@@ -15,10 +16,15 @@ export class EditLayer extends SimContainer {
   private row: number;
   private col: number;
 
+  public currentTool: PUYOTYPE | number | boolean;
+  public currentLayer: number;
+
   constructor(chainsim: Chainsim, layers: Layer[]) {
     super(chainsim);
 
     this.layers = layers;
+    this.currentTool = 0;
+    this.currentLayer = 0;
 
     // Put a layer over the whole field
     this.rect = new Graphics();
@@ -65,17 +71,17 @@ export class EditLayer extends SimContainer {
   public setCellData(): void {
     const slide = this.simState.slides[this.simState.slidePos];
     const slideFields = [slide.puyo, slide.shadow, slide.arrow, slide.cursor, slide.number];
-    const targetField = slideFields[this.simState.currentLayer];
-    const targetLayer = this.layers[this.simState.currentLayer];
+    const targetField = slideFields[this.currentLayer];
+    const targetLayer = this.layers[this.currentLayer];
 
-    if (targetField instanceof PuyoField && typeof this.simState.currentTool === 'number') {
-      targetField.set(this.row, this.col, this.simState.currentTool);
+    if (targetField instanceof PuyoField && typeof this.currentTool === 'number') {
+      targetField.set(this.row, this.col, this.currentTool);
       targetLayer.refreshSprites(targetField);
     } else if (targetField instanceof BoolField) {
-      targetField.set(this.row, this.col, !!this.simState.currentTool);
+      targetField.set(this.row, this.col, !!this.currentTool);
       targetLayer.refreshSprites(targetField);
-    } else if (targetField instanceof NumField && typeof this.simState.currentTool === 'number') {
-      targetField.set(this.row, this.col, this.simState.currentTool);
+    } else if (targetField instanceof NumField && typeof this.currentTool === 'number') {
+      targetField.set(this.row, this.col, this.currentTool);
       targetLayer.refreshSprites(targetField);
     }
   }

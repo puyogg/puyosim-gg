@@ -6,6 +6,8 @@ import { Chainsim } from '..';
 import { PUYOTYPE } from '../../solver/constants';
 import { Button } from './button';
 import { ToolSprite } from './tool';
+import { Frame } from '../frame';
+import { EditLayer } from '../field-layer';
 
 export abstract class Page extends SimContainer {
   public toolboxTextures: PIXI.ITextureDictionary;
@@ -14,6 +16,7 @@ export abstract class Page extends SimContainer {
   public delete: ToolSprite;
   public tools: ToolSprite[];
   public clearLayer: Button;
+  public editLayer: EditLayer;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
@@ -22,6 +25,7 @@ export abstract class Page extends SimContainer {
     this.toolboxTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
     this.tools = [];
+    this.editLayer = (this.chainsim.frame as Frame).editLayer;
 
     // Cursor
     this.toolCursor = new Sprite(this.toolboxTextures['current_tool.png']);
@@ -31,7 +35,7 @@ export abstract class Page extends SimContainer {
     this.addChild(this.toolCursor);
 
     // X
-    this.delete = new ToolSprite(this.toolboxTextures['editor_x.png'], this.toolCursor, 0, this, this.simState);
+    this.delete = new ToolSprite(this.toolboxTextures['editor_x.png'], this.toolCursor, 0, this, this.editLayer);
     this.delete.anchor.set(0.5);
     this.delete.position.set(48, 48);
     this.tools.push(this.delete);

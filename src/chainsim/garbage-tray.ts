@@ -21,10 +21,13 @@ class GarbageTray extends SimContainer {
   private targetCoords: number[];
   private showCount: boolean;
 
+  private prevState: (delta: number) => void;
+
   constructor(chainsim: Chainsim, puyoLayer: PuyoLayer) {
     super(chainsim);
 
     this.puyoLayer = puyoLayer;
+    this.prevState = this.chainsim.idle;
 
     this.trayTextures = this.resources[`${ASSET_PATH}/layout.json`].textures as PIXI.ITextureDictionary;
     this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
@@ -80,13 +83,16 @@ class GarbageTray extends SimContainer {
     const showGarbageUpdate = this.count !== this.simState.solver.states[this.simState.solverStep].garbage;
     const puyoLayerBursting = this.puyoLayer.runningBurstAnimation;
     const correctState = this.chainsim.animationState === this.chainsim.animatePops;
+    const popSkipped =
+      this.prevState === this.chainsim.animatePops && this.chainsim.animationState === this.chainsim.chainPaused;
 
-    if (puyoLayerBursting && correctState && showGarbageUpdate) {
+    if ((puyoLayerBursting && correctState && showGarbageUpdate) || (showGarbageUpdate && popSkipped)) {
       this.count = this.simState.solver.states[this.simState.solverStep].garbage;
       this.prepGarbageAnimation();
       this.setNumbers();
     }
 
+    this.prevState = this.chainsim.animationState;
     this.animateGarbage();
   }
 

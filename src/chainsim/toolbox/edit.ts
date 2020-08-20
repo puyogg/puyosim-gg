@@ -8,6 +8,8 @@ import { PageArrow } from './arrow';
 import { PageCursor } from './cursor';
 import { PageNumber } from './number';
 import { Page } from './page';
+import { EditLayer } from '../field-layer';
+import { Frame } from '../frame';
 
 export class EditingTools extends SimContainer {
   private toolboxTextures: PIXI.ITextureDictionary;
@@ -23,10 +25,14 @@ export class EditingTools extends SimContainer {
   private pageNumber: PageNumber;
   private pages: Page[];
 
+  private editLayer: EditLayer;
+
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
     this.toolboxTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
+
+    this.editLayer = (this.chainsim.frame as Frame).editLayer;
 
     this.pageMain = new PageMain(chainsim);
     this.pageShadow = new PageShadow(chainsim);
@@ -36,7 +42,7 @@ export class EditingTools extends SimContainer {
     this.addChild(this.pageMain, this.pageShadow, this.pageArrow, this.pageCursor, this.pageNumber);
 
     this.pages = [this.pageMain, this.pageShadow, this.pageArrow, this.pageCursor, this.pageNumber];
-    this.simState.currentLayer = 0;
+    this.editLayer.currentLayer = 0;
 
     // Page Left, full width 238
     this.pageLeft = new Sprite(this.toolboxTextures['picker_arrow_left.png']);
@@ -69,7 +75,7 @@ export class EditingTools extends SimContainer {
 
   public setCurrentPage(): void {
     this.pages.forEach((page) => (page.visible = false));
-    const page = this.pages[this.simState.currentLayer];
+    const page = this.pages[this.editLayer.currentLayer];
     page.visible = true;
     page.setCurrent(); // Set the page's current tool
     this.layerName.texture = this.toolboxTextures[`layer_${page.name}.png`];
@@ -77,9 +83,9 @@ export class EditingTools extends SimContainer {
 
   public setNextPage(): void {
     this.pages.forEach((page) => (page.visible = false));
-    this.simState.currentLayer =
-      this.simState.currentLayer === this.pages.length - 1 ? 0 : this.simState.currentLayer + 1;
-    const page = this.pages[this.simState.currentLayer];
+    this.editLayer.currentLayer =
+      this.editLayer.currentLayer === this.pages.length - 1 ? 0 : this.editLayer.currentLayer + 1;
+    const page = this.pages[this.editLayer.currentLayer];
     page.visible = true;
     page.setCurrent(); // Set the page's current tool
     this.layerName.texture = this.toolboxTextures[`layer_${page.name}.png`];
@@ -87,9 +93,9 @@ export class EditingTools extends SimContainer {
 
   public setPrevPage(): void {
     this.pages.forEach((page) => (page.visible = false));
-    this.simState.currentLayer =
-      this.simState.currentLayer === 0 ? this.pages.length - 1 : this.simState.currentLayer - 1;
-    const page = this.pages[this.simState.currentLayer];
+    this.editLayer.currentLayer =
+      this.editLayer.currentLayer === 0 ? this.pages.length - 1 : this.editLayer.currentLayer - 1;
+    const page = this.pages[this.editLayer.currentLayer];
     page.visible = true;
     page.setCurrent(); // Set the page's current tool
     this.layerName.texture = this.toolboxTextures[`layer_${page.name}.png`];

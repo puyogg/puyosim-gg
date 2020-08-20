@@ -74,10 +74,6 @@ class Chainsim {
         this.simLoaded = true;
         this.init();
         this.app.ticker.add((delta: number) => this.gameLoop(delta));
-
-        // setInterval(() => {
-        //   this.gameLoop(1);
-        // }, 30);
       });
 
     // Add components that this instance of Chainsim will need
@@ -128,15 +124,12 @@ class Chainsim {
     ///////////////////////
 
     this.animationState = this.idle;
-
-    globalThis.run = () => {
-      this.simulateStep();
-    };
   }
 
   private gameLoop(delta: number) {
-    // console.log('Current state:', this.animationState);
-    this.animationState(delta);
+    for (let i = 0; i < this.state.simSpeed; i++) {
+      this.animationState(delta);
+    }
   }
 
   /** Chain solver inactive, no other actions */
@@ -145,7 +138,7 @@ class Chainsim {
   }
 
   /** Simulate a step. This function assumes the previous state was this.idle() */
-  public simulateStep(): void {
+  public startSimulation(): void {
     const puyoField = this.state.slides[this.state.slidePos].puyo;
 
     if (this.animationState === this.idle) {
@@ -155,8 +148,10 @@ class Chainsim {
       this.state.solverStep = 0;
     }
 
-    // Decide whether we're gonna animate drops or pops.
-    // Run the preparation methods.
+    this.continueSimulation();
+  }
+
+  public continueSimulation(): void {
     if (this.state.solver.states[this.state.solverStep].hasDrops) {
       return this.prepAnimateChainDrops();
     } else if (this.state.solver.states[this.state.solverStep].hasPops) {
@@ -175,7 +170,7 @@ class Chainsim {
     this.frame?.puyoLayer.prepAnimateChainDrops(puyoField);
   }
 
-  private animateChainDrops(delta: number) {
+  public animateChainDrops(delta: number): void {
     const finished = this.frame?.puyoLayer.animateChainDrops(delta);
     if (finished) {
       // Advance to the next solver step.
@@ -213,7 +208,7 @@ class Chainsim {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private chainPaused(delta: number) {
+  public chainPaused(delta: number): void {
     // Similar to idle, but editor functions should be disabled.
     // console.log('Chain finished.');
   }

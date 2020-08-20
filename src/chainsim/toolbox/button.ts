@@ -16,5 +16,9 @@ export class Button extends Sprite {
     this.addListener('pointerup', () => {
       this.texture = this.upTexture;
     });
+
+    this.addListener('pointerdown', () => {
+      this.texture = this.dnTexture;
+    });
   }
 }
