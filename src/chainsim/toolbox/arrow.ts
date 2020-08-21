@@ -31,17 +31,9 @@ export class PageArrow extends Page {
         this.addChild(tool);
       }
     }
-
-    this.setListeners();
   }
 
   public setCurrent(): void {
     this.editLayer.currentTool = this.currentTool;
-  }
-
-  public setListeners(): void {
-    this.clearLayer.on('pointerup', () => {
-      alert('Arrow');
-    });
   }
 }

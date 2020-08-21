@@ -11,6 +11,8 @@ class ScoreDisplay extends SimContainer {
   private puyoLayer: PuyoLayer;
   private score: number;
 
+  private prevState: (delta: number) => void;
+
   constructor(chainsim: Chainsim, puyoLayer: PuyoLayer) {
     super(chainsim);
 
@@ -19,6 +21,7 @@ class ScoreDisplay extends SimContainer {
     this.puyoLayer = puyoLayer;
     this.chainsim = chainsim;
     this.score = 0;
+    this.prevState = this.chainsim.idle;
 
     // Initialize sprites
     for (let i = 0; i < 8; i++) {
@@ -33,7 +36,6 @@ class ScoreDisplay extends SimContainer {
 
   public update(): void {
     const showScoreUpdate = this.score !== this.simState.solver.states[this.simState.solverStep].score;
-
     // The displayed score needs to be slightly older than what's in the solver state
     // so it can display without glitching during the popping animation.
     if (this.chainsim.animationState !== this.chainsim.animatePops) {
@@ -47,9 +49,17 @@ class ScoreDisplay extends SimContainer {
 
     if (puyoLayerPopping && correctState) {
       this.showMultipliers();
+    } else if (
+      (this.prevState === this.chainsim.animatePops || this.prevState === this.chainsim.animateChainDrops) &&
+      (this.chainsim.animationState === this.chainsim.idle ||
+        this.chainsim.animationState === this.chainsim.chainPaused)
+    ) {
+      this.showScore();
     } else {
       if (showScoreUpdate) this.showScore();
     }
+
+    this.prevState = this.chainsim.animationState;
   }
 
   private reset(): void {

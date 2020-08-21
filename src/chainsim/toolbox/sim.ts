@@ -21,21 +21,66 @@ class SimTools extends SimContainer {
     this.btnShare = new Button(this.toolboxTextures['btn_share.png'], this.toolboxTextures['btn_share_pressed.png']);
     this.btnShare.anchor.set(0.5);
     this.btnShare.position.set(0, 0);
+    this.btnShare.on('pointerdown', () => {
+      console.log(this.simState.slides[this.simState.slidePos]);
+    });
     this.addChild(this.btnShare);
 
     this.btnReset = new Button(this.toolboxTextures['btn_reset.png'], this.toolboxTextures['btn_reset_pressed.png']);
     this.btnReset.anchor.set(0.5);
     this.btnReset.position.set(79, 0);
+    this.btnReset.on('pointerdown', () => {
+      this.simState.solverStep = 0;
+      this.chainsim.animationState = this.chainsim.idle;
+      const puyoField = this.simState.solver.states[this.simState.solverStep].puyoField;
+      this.chainsim.frame?.puyoLayer.refreshSprites(puyoField);
+    });
     this.addChild(this.btnReset);
 
     this.btnBack = new Button(this.toolboxTextures['btn_back.png'], this.toolboxTextures['btn_back_pressed.png']);
     this.btnBack.anchor.set(0.5);
     this.btnBack.position.set(0, 72);
+    this.btnBack.on('pointerdown', () => {
+      if (
+        this.chainsim.animationState === this.chainsim.animatePops ||
+        this.chainsim.animationState === this.chainsim.animateChainDrops
+      ) {
+        this.simState.solverStep = this.simState.solverStep === 0 ? 0 : this.simState.solverStep - 1;
+        this.simState.simSpeed = 1;
+        this.chainsim.animationState = this.chainsim.chainPaused;
+        const puyoField = this.simState.solver.states[this.simState.solverStep].puyoField;
+        this.chainsim.frame?.puyoLayer.refreshSprites(puyoField);
+        return;
+      }
+
+      if (
+        this.chainsim.animationState === this.chainsim.idle ||
+        this.chainsim.animationState === this.chainsim.chainPaused
+      ) {
+        if (this.simState.solverStep === 0) {
+          this.chainsim.animationState = this.chainsim.idle;
+        } else {
+          this.simState.solverStep = this.simState.solverStep - 1;
+        }
+        const puyoField = this.simState.solver.states[this.simState.solverStep].puyoField;
+        this.chainsim.frame?.puyoLayer.refreshSprites(puyoField);
+      }
+    });
     this.addChild(this.btnBack);
 
     this.btnPause = new Button(this.toolboxTextures['btn_pause.png'], this.toolboxTextures['btn_pause_pressed.png']);
     this.btnPause.anchor.set(0.5);
     this.btnPause.position.set(79, 72);
+    this.btnPause.on('pointerdown', () => {
+      if (
+        this.chainsim.animationState === this.chainsim.animatePops ||
+        this.chainsim.animationState === this.chainsim.animateChainDrops
+      ) {
+        this.chainsim.animationState = this.chainsim.chainPaused;
+        const puyoField = this.simState.solver.states[this.simState.solverStep].puyoField;
+        this.chainsim.frame?.puyoLayer.refreshSprites(puyoField);
+      }
+    });
     this.addChild(this.btnPause);
 
     this.btnStep = new Button(this.toolboxTextures['btn_step.png'], this.toolboxTextures['btn_step_pressed.png']);
@@ -92,6 +137,7 @@ class SimTools extends SimContainer {
         this.chainsim.animationState === this.chainsim.animatePops ||
         this.chainsim.animationState === this.chainsim.animateChainDrops
       ) {
+        this.simState.autoStep = true;
         this.simState.simSpeed *= 2;
         return;
       }

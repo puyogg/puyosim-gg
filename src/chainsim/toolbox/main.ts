@@ -3,6 +3,7 @@ import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
 import { PUYOTYPE } from '../../solver/constants';
 import { ToolSprite } from './tool';
+import { Frame } from '../frame';
 
 const names: string[][] = [
   ['red', 'green', 'blue'],
@@ -43,17 +44,9 @@ export class PageMain extends Page {
         this.addChild(tool);
       }
     }
-
-    this.setListeners();
   }
 
   public setCurrent(): void {
     this.editLayer.currentTool = this.currentTool;
-  }
-
-  public setListeners(): void {
-    this.clearLayer.on('pointerup', () => {
-      alert('Main');
-    });
   }
 }

@@ -9,9 +9,4 @@ export class PageShadow extends PageMain {
   }
 
   // Overrides the setListeners from pageMain. Automatically gets called when super is called.
-  public setListeners(): void {
-    this.clearLayer.on('pointerup', () => {
-      alert('Shadow');
-    });
-  }
 }

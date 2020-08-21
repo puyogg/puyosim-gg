@@ -28,28 +28,28 @@ class Frame extends SimContainer {
     this.layerContainer.y = -8;
     this.addChild(this.layerContainer);
 
-    // this.chainsim.state.slides[0].shadow.data.fill(PUYOTYPE.GARBAGE); // Test
+    this.chainsim.state.slides[0].shadow.data.fill(PUYOTYPE.GARBAGE); // Test
     this.shadowLayer = new ShadowLayer(chainsim);
     this.layerContainer.addChild(this.shadowLayer);
 
     this.puyoLayer = new PuyoLayer(chainsim);
     this.layerContainer.addChild(this.puyoLayer);
 
-    // for (let i = 0; i < this.chainsim.state.slides[0].arrow.data.length; i++) {
-    //   this.chainsim.state.slides[0].arrow.data[i] = Math.floor(Math.random() * 4) + 1;
-    // }
+    for (let i = 0; i < this.chainsim.state.slides[0].arrow.data.length; i++) {
+      this.chainsim.state.slides[0].arrow.data[i] = Math.floor(Math.random() * 4) + 1;
+    }
     this.arrowLayer = new ArrowLayer(chainsim);
     this.layerContainer.addChild(this.arrowLayer);
 
-    // for (let i = 0; i < this.chainsim.state.slides[0].cursor.data.length; i++) {
-    //   this.chainsim.state.slides[0].cursor.data[i] = Math.round(Math.random()) === 0;
-    // }
+    for (let i = 0; i < this.chainsim.state.slides[0].cursor.data.length; i++) {
+      this.chainsim.state.slides[0].cursor.data[i] = Math.round(Math.random()) === 0;
+    }
     this.cursorLayer = new CursorLayer(chainsim);
     this.layerContainer.addChild(this.cursorLayer);
 
-    // for (let i = 0; i < this.chainsim.state.slides[0].number.data.length; i++) {
-    //   this.chainsim.state.slides[0].number.data[i] = Math.floor(Math.random() * 100);
-    // }
+    for (let i = 0; i < this.chainsim.state.slides[0].number.data.length; i++) {
+      this.chainsim.state.slides[0].number.data[i] = Math.floor(Math.random() * 100);
+    }
     this.numberLayer = new NumberLayer(chainsim);
     this.layerContainer.addChild(this.numberLayer);
 
@@ -58,10 +58,6 @@ class Frame extends SimContainer {
     // Editor layer
     this.editLayer = new EditLayer(chainsim, this.layers);
     this.layerContainer.addChild(this.editLayer);
-
-    // this.arrowLayer.alpha = 0;
-    // this.cursorLayer.alpha = 0;
-    // this.numberLayer.alpha = 0;
   }
 
   public update(delta: number): void {

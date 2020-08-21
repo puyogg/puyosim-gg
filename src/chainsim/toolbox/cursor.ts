@@ -16,17 +16,9 @@ export class PageCursor extends Page {
     this.tool.x = 48;
     this.tool.y = 120;
     this.addChild(this.tool);
-
-    this.setListeners();
   }
 
   public setCurrent(): void {
     this.editLayer.currentTool = this.currentTool;
-  }
-
-  public setListeners(): void {
-    this.clearLayer.on('pointerup', () => {
-      alert('Cursor');
-    });
   }
 }

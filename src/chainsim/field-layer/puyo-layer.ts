@@ -245,7 +245,11 @@ class PuyoLayer extends Layer {
           if (isColored(puyo)) {
             let connection = 0;
             // Check down
-            if (newR < this.rows - 1 && puyo === this.tempField.get(newR + 1, c)) {
+            if (
+              newR < this.rows - 1 &&
+              puyo === this.tempField.get(newR + 1, c) &&
+              this.dropDists.get(newR + 1, c) === 0
+            ) {
               // const [dn, up, rt, lf] = [1, 2, 4, 8];
               connection += 1;
               const nConnection = this.connectivity.addAt(newR + 1, c, 2);
@@ -254,7 +258,11 @@ class PuyoLayer extends Layer {
               this.sprites[(newR + 1) * this.cols + c].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             // Check up
-            if (newR > this.hrows && puyo === this.tempField.get(newR - 1, c)) {
+            if (
+              newR > this.hrows &&
+              puyo === this.tempField.get(newR - 1, c) &&
+              this.dropDists.get(newR - 1, c) === 0
+            ) {
               connection += 2;
               const nConnection = this.connectivity.addAt(newR - 1, c, 1);
               const nPuyo = this.tempField.get(newR - 1, c);
@@ -262,7 +270,11 @@ class PuyoLayer extends Layer {
               this.sprites[(newR - 1) * this.cols + c].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             // check right
-            if (c < this.cols - 1 && puyo === this.tempField.get(newR, c + 1)) {
+            if (
+              c < this.cols - 1 &&
+              puyo === this.tempField.get(newR, c + 1) &&
+              this.dropDists.get(newR, c + 1) === 0
+            ) {
               connection += 4;
               const nConnection = this.connectivity.addAt(newR, c + 1, 8);
               const nPuyo = this.tempField.get(newR, c + 1);
@@ -270,7 +282,7 @@ class PuyoLayer extends Layer {
               this.sprites[newR * this.cols + c + 1].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             // check left
-            if (c > 0 && puyo === this.tempField.get(newR, c - 1)) {
+            if (c > 0 && puyo === this.tempField.get(newR, c - 1) && this.dropDists.get(newR, c - 1) === 0) {
               connection += 8;
               const nConnection = this.connectivity.addAt(newR, c - 1, 4);
               const nPuyo = this.tempField.get(newR, c - 1);
@@ -278,6 +290,7 @@ class PuyoLayer extends Layer {
               this.sprites[newR * this.cols + c - 1].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             this.sprites[newR * this.cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_${connection}.png`];
+            console.log(r, newR, c, connection);
             this.connectivity.set(newR, c, connection);
           } else {
             this.sprites[newR * this.cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_0.png`];

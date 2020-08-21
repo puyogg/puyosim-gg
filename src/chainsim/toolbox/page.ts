@@ -48,6 +48,9 @@ export abstract class Page extends SimContainer {
     );
     this.clearLayer.anchor.set(0.5);
     this.clearLayer.position.set(160, 48);
+    this.clearLayer.on('pointerdown', () => {
+      (this.chainsim.frame as Frame).editLayer.clearAllCells();
+    });
     this.addChild(this.clearLayer);
   }
 

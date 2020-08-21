@@ -5,6 +5,7 @@ import { Layer } from './layer';
 import { Chainsim } from '..';
 import { PuyoField, BoolField, NumField } from '../../solver/field';
 import { PUYOTYPE } from '../../solver/constants';
+import { get2d } from '../../solver/helper';
 
 export class EditLayer extends SimContainer {
   private rect: Graphics;
@@ -82,6 +83,24 @@ export class EditLayer extends SimContainer {
       targetLayer.refreshSprites(targetField);
     } else if (targetField instanceof NumField && typeof this.currentTool === 'number') {
       targetField.set(this.row, this.col, this.currentTool);
+      targetLayer.refreshSprites(targetField);
+    }
+  }
+
+  public clearAllCells(): void {
+    const slide = this.simState.slides[this.simState.slidePos];
+    const slideFields = [slide.puyo, slide.shadow, slide.arrow, slide.cursor, slide.number];
+    const targetField = slideFields[this.currentLayer];
+    const targetLayer = this.layers[this.currentLayer];
+
+    if (targetField instanceof PuyoField && typeof this.currentTool === 'number') {
+      targetField.data.fill(0);
+      targetLayer.refreshSprites(targetField);
+    } else if (targetField instanceof BoolField) {
+      targetField.data.fill(false);
+      targetLayer.refreshSprites(targetField);
+    } else if (targetField instanceof NumField && typeof this.currentTool === 'number') {
+      targetField.data.fill(0);
       targetLayer.refreshSprites(targetField);
     }
   }

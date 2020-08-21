@@ -21,6 +21,7 @@ class ChainCounter extends SimContainer {
   private acceleration: number;
 
   private prevState: (delta: number) => void;
+  private solverPos: number;
 
   constructor(chainsim: Chainsim, puyoLayer: PuyoLayer) {
     super(chainsim);
@@ -28,6 +29,7 @@ class ChainCounter extends SimContainer {
     this.puyoLayer = puyoLayer;
     this.chainsim = chainsim;
     this.prevState = this.chainsim.idle;
+    this.solverPos = 0;
 
     this.textures = this.resources[`${ASSET_PATH}/chain_font.json`].textures as PIXI.ITextureDictionary;
 
@@ -68,11 +70,10 @@ class ChainCounter extends SimContainer {
     const correctState = this.chainsim.animationState === this.chainsim.animatePops;
     const popSkipped =
       this.prevState === this.chainsim.animatePops && this.chainsim.animationState === this.chainsim.chainPaused;
+    const wentBack = this.solverPos > this.simState.solverStep;
 
-    if (puyoLayerBursting && correctState && showNumberUpdate) {
-      this.chain = this.simState.solver.states[this.simState.solverStep].chainLength;
-      this.prepAnimation();
-    } else if (showNumberUpdate && popSkipped) {
+    if ((puyoLayerBursting && correctState && showNumberUpdate) || (showNumberUpdate && popSkipped) || wentBack) {
+      this.solverPos = this.simState.solverStep;
       this.chain = this.simState.solver.states[this.simState.solverStep].chainLength;
       this.prepAnimation();
     }

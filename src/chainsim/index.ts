@@ -6,6 +6,7 @@ import { ScoreDisplay } from './score';
 import { GarbageTray } from './garbage-tray';
 import { ChainCounter } from './chain-counter';
 import { Toolbox } from './toolbox';
+import { NextWindow } from './next-window';
 
 /** Subset of options available at https://pixijs.download/v5.3.3/docs/PIXI.Application.html */
 interface PixiOptions {
@@ -39,6 +40,9 @@ class Chainsim {
   // Toolbox
   private toolbox: Toolbox | undefined;
   private chainCounter: ChainCounter | undefined;
+
+  // Next Window
+  public nextWindow: NextWindow | undefined;
 
   // Function that plays on every tick. Swap it out with other methods.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -114,6 +118,11 @@ class Chainsim {
     this.toolbox.position.set(438, 548);
     this.app.stage.addChild(this.toolbox);
     /////////////////
+
+    this.nextWindow = new NextWindow(this);
+    this.nextWindow.position.set(456, 160);
+    // this.nextWindow.position.set(200, 200);
+    this.app.stage.addChild(this.nextWindow);
 
     //// CHAIN COUNTER ////
     this.chainCounter = new ChainCounter(this, this.frame.puyoLayer);
