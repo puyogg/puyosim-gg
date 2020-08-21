@@ -1,42 +1,45 @@
 import * as PIXI from 'pixi.js';
-import { Sprite, Container } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
 import { Window } from './window';
 import { DrawerToggle } from './toggle';
 import { ASSET_PATH } from '../constants';
 import { Drawer } from './drawer';
-import { NextEditor } from './editor';
+import { ColorSet } from './color-set';
+
+export interface WinState {
+  currentTool: number;
+  reset: boolean;
+}
 
 export class NextWindow extends SimContainer {
   private toolTextures: PIXI.ITextureDictionary;
-  private numTextures: PIXI.ITextureDictionary;
+
+  private winState: WinState;
 
   private window: Window;
   private toggle: DrawerToggle;
   private drawer: Drawer;
-  private editor: NextEditor;
-  private drawerContainer: Container;
-  private numbers: Sprite[];
+  private colorSet: ColorSet;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
     this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
-    this.numTextures = this.resources[`${ASSET_PATH}/scoreFont.json`].textures as PIXI.ITextureDictionary;
+
+    this.winState = {
+      currentTool: 0,
+      reset: false,
+    };
 
     this.window = new Window(chainsim);
     this.addChild(this.window);
 
-    this.drawerContainer = new Container();
-    this.drawerContainer.position.set(-18, 310);
-    this.drawerContainer.visible = false;
-    this.addChild(this.drawerContainer);
-
-    this.drawer = new Drawer(chainsim);
+    this.drawer = new Drawer(chainsim, this.winState);
     this.drawer.interactive = true;
-    this.editor = new NextEditor(chainsim);
-    this.drawerContainer.addChild(this.drawer, this.editor);
+    this.drawer.visible = false;
+    this.drawer.position.set(-18, 310);
+    this.addChild(this.drawer);
 
     this.toggle = new DrawerToggle(
       this.toolTextures['next_show.png'],
@@ -49,17 +52,12 @@ export class NextWindow extends SimContainer {
     this.toggle.rotation = (-1 * Math.PI) / 2;
     this.toggle.position.set(22, 242);
     this.toggle.on('pointerup', () => {
-      this.drawerContainer.visible = this.toggle.active;
+      this.drawer.visible = this.toggle.active;
     });
     this.addChild(this.toggle);
 
-    this.numbers = [];
-    for (let i = 0; i < 7; i++) {
-      this.numbers[i] = new Sprite(this.numTextures[`score_${i + 3}.png`]);
-      this.numbers[i].anchor.set(0.5);
-      this.numbers[i].scale.set(0.8);
-      this.numbers[i].position.set(80, 340 + i * (this.numbers[i].height + 12));
-      this.addChild(this.numbers[i]);
-    }
+    this.colorSet = new ColorSet(chainsim, this.winState);
+    this.colorSet.position.set(130, 40);
+    this.addChild(this.colorSet);
   }
 }

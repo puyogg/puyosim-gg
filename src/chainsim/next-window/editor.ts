@@ -3,16 +3,21 @@ import { Sprite } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
 import { ASSET_PATH } from '../constants';
+import { WinState } from '.';
 
 export class NextEditor extends SimContainer {
   private toolTextures: PIXI.ITextureDictionary;
   private puyoTextures: PIXI.ITextureDictionary;
   private layoutTextures: PIXI.ITextureDictionary;
 
+  private winState: WinState;
+
   private container: Sprite;
 
-  constructor(chainsim: Chainsim) {
+  constructor(chainsim: Chainsim, winState: WinState) {
     super(chainsim);
+
+    this.winState = winState;
 
     this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
     this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;

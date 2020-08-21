@@ -83,8 +83,7 @@ export class EditingTools extends SimContainer {
 
   public setNextPage(): void {
     this.pages.forEach((page) => (page.visible = false));
-    this.editLayer.currentLayer =
-      this.editLayer.currentLayer === this.pages.length - 1 ? 0 : this.editLayer.currentLayer + 1;
+    this.editLayer.currentLayer = (this.editLayer.currentLayer + 1) % this.pages.length;
     const page = this.pages[this.editLayer.currentLayer];
     page.visible = true;
     page.setCurrent(); // Set the page's current tool
@@ -93,8 +92,7 @@ export class EditingTools extends SimContainer {
 
   public setPrevPage(): void {
     this.pages.forEach((page) => (page.visible = false));
-    this.editLayer.currentLayer =
-      this.editLayer.currentLayer === 0 ? this.pages.length - 1 : this.editLayer.currentLayer - 1;
+    this.editLayer.currentLayer = (this.editLayer.currentLayer - 1 + this.pages.length) % this.pages.length;
     const page = this.pages[this.editLayer.currentLayer];
     page.visible = true;
     page.setCurrent(); // Set the page's current tool

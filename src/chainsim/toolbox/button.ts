@@ -2,8 +2,8 @@ import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 
 export class Button extends Sprite {
-  private upTexture: PIXI.Texture;
-  private dnTexture: PIXI.Texture;
+  public upTexture: PIXI.Texture;
+  public dnTexture: PIXI.Texture;
 
   constructor(up: PIXI.Texture, down: PIXI.Texture) {
     super(up);

@@ -26,7 +26,7 @@ interface PixiOptions {
  * - Provides methods for mounting the game to an HTMLElement.
  */
 class Chainsim {
-  private app: PIXI.Application;
+  public app: PIXI.Application;
   private loader: PIXI.Loader;
   private simLoaded: boolean;
   public state: AppState;

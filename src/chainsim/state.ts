@@ -1,6 +1,7 @@
 import { PuyoField, NumField, BoolField } from '../solver/field';
 import { PUYOTYPE, DEFAULT_SETTINGS } from '../solver/constants';
 import { ChainSolver } from '../solver';
+import { TsuRNG } from './rng';
 
 interface SimulatorSettings {
   rows: number;
@@ -36,6 +37,12 @@ function isPuyoArray(array: PUYOTYPE[] | FieldData[]): array is PUYOTYPE[] {
 }
 
 class AppState {
+  // Puyo Randomization
+  public seed: number; // 32-bit unsigned integer
+  public pool: number[];
+  public origPool: number[];
+  public poolPos: number;
+
   // Overall state
   public mode: 'editor' | 'game';
 
@@ -61,6 +68,13 @@ class AppState {
   constructor(x?: LoadableSlideData) {
     this.mode = 'editor'; // Need to include option to load straight into game mode.
 
+    this.seed = Math.floor(Math.random() * 4294967296); // 32-bit unsigned int
+    console.log('Color seed: ', this.seed);
+    this.pool = TsuRNG.getPools(this.seed, [2, 3, 4, 5, 6]).color4;
+    console.log('Pool: ', this.pool);
+    this.origPool = this.pool.slice();
+    this.poolPos = 0;
+
     this.simSettings = {
       rows: 13,
       cols: 6,
@@ -76,7 +90,6 @@ class AppState {
     // This should get overwritten by any incoming states.
     this.slides = [];
     this.initSlides(x);
-    console.log(this.slides);
     this.slidePos = 0;
 
     // Chain solver with full step tracking for guiding the chain animation

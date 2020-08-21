@@ -21,21 +21,21 @@ export class Next extends SimContainer {
     this.ticker = 0;
 
     this.coords = [
-      { x: 54, y: 64 },
       { x: 54, y: 124 },
-      { x: 100, y: 200 - 6 },
+      { x: 54, y: 64 },
       { x: 100, y: 251 - 6 },
-      { x: 100, y: 330 },
+      { x: 100, y: 200 - 6 },
       { x: 100, y: 330 + 51 },
+      { x: 100, y: 330 },
     ];
 
     this.targetCoords = [
-      { x: 54, y: -100 },
       { x: 54, y: -40 },
-      { x: 54, y: 64 },
+      { x: 54, y: -100 },
       { x: 54, y: 124 },
-      { x: 100, y: 200 - 6 },
+      { x: 54, y: 64 },
       { x: 100, y: 251 - 6 },
+      { x: 100, y: 200 - 6 },
     ];
 
     this.scaling = 0.85;
