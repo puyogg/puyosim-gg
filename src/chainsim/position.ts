@@ -29,6 +29,14 @@ class PositionMatrix {
     const y = this.yPos[row * this.cols + col];
     return { x: x, y: y };
   }
+
+  public addToY(value: number): void {
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        this.yPos[r * this.cols + c] += value;
+      }
+    }
+  }
 }
 
 export { Coord, PositionMatrix };

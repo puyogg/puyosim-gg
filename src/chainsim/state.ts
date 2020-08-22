@@ -42,9 +42,11 @@ class AppState {
   public pool: number[];
   public origPool: number[];
   public poolPos: number;
+  public poolChanged: boolean; // If you manually edit any puyos
 
   // Overall state
   public mode: 'editor' | 'game';
+  public replay: boolean;
 
   // Sizing
   public simSettings: SimulatorSettings;
@@ -67,6 +69,7 @@ class AppState {
 
   constructor(x?: LoadableSlideData) {
     this.mode = 'editor'; // Need to include option to load straight into game mode.
+    this.replay = false; // If true, don't override the next slides when the sim steps.
 
     this.seed = Math.floor(Math.random() * 4294967296); // 32-bit unsigned int
     console.log('Color seed: ', this.seed);
@@ -74,6 +77,7 @@ class AppState {
     console.log('Pool: ', this.pool);
     this.origPool = this.pool.slice();
     this.poolPos = 0;
+    this.poolChanged = false;
 
     this.simSettings = {
       rows: 13,
@@ -147,30 +151,43 @@ class AppState {
     };
   }
 
-  public addSlide(fieldData?: FieldData): void {
+  public addSlide(fieldData?: FieldData | PuyoField): void {
     let newSlide: FieldData;
+    const rows = this.simSettings.rows;
+    const cols = this.simSettings.cols;
 
-    if (fieldData) {
+    // Gotta update this to also handle reading replays...
+    if (fieldData instanceof PuyoField) {
+      newSlide = {
+        puyo: new PuyoField(rows, cols, fieldData.data),
+        shadow: new PuyoField(rows, cols),
+        arrow: new NumField(rows, cols),
+        cursor: new BoolField(rows, cols),
+        number: new NumField(rows, cols),
+      };
+    } else if (fieldData) {
       // Create a copy of the passed in field data if it was defined.
       newSlide = {
-        puyo: new PuyoField(this.simSettings.rows, this.simSettings.cols, fieldData.puyo.data),
-        shadow: new PuyoField(this.simSettings.rows, this.simSettings.cols, fieldData.shadow.data),
-        arrow: new NumField(this.simSettings.rows, this.simSettings.cols, fieldData.arrow.data),
-        cursor: new BoolField(this.simSettings.rows, this.simSettings.cols, fieldData.cursor.data),
-        number: new NumField(this.simSettings.rows, this.simSettings.cols, fieldData.number.data),
+        puyo: new PuyoField(rows, cols, fieldData.puyo.data),
+        shadow: new PuyoField(rows, cols, fieldData.shadow.data),
+        arrow: new NumField(rows, cols, fieldData.arrow.data),
+        cursor: new BoolField(rows, cols, fieldData.cursor.data),
+        number: new NumField(rows, cols, fieldData.number.data),
       };
     } else {
       // Otherwise, append an empty slide
       newSlide = {
-        puyo: new PuyoField(this.simSettings.rows, this.simSettings.cols),
-        shadow: new PuyoField(this.simSettings.rows, this.simSettings.cols),
-        arrow: new NumField(this.simSettings.rows, this.simSettings.cols),
-        cursor: new BoolField(this.simSettings.rows, this.simSettings.cols),
-        number: new NumField(this.simSettings.rows, this.simSettings.cols),
+        puyo: new PuyoField(rows, cols),
+        shadow: new PuyoField(rows, cols),
+        arrow: new NumField(rows, cols),
+        cursor: new BoolField(rows, cols),
+        number: new NumField(rows, cols),
       };
     }
 
-    this.slides.push(newSlide);
+    // Assuming slidePos had already been increased before this whole function was called...
+    this.slides.splice(this.slidePos, 1, newSlide);
+    console.log(this.slides);
   }
 
   public get latestFields(): FieldData {

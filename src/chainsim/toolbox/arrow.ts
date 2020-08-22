@@ -20,7 +20,7 @@ export class PageArrow extends Page {
       for (let c = 0; c < angles[r].length; c++) {
         const angle = angles[r][c];
         const value = toolValue[r][c];
-        const texture = this.toolboxTextures[`arrow.png`];
+        const texture = this.toolTextures[`arrow.png`];
         const tool = new ToolSprite(texture, this.toolCursor, value, this, this.editLayer);
         tool.anchor.set(0.5);
         tool.x = 48 + 71 * c;

@@ -89,11 +89,19 @@ class GarbageTray extends SimContainer {
       this.prevState === this.chainsim.animatePops && this.chainsim.animationState === this.chainsim.chainPaused;
     const wentBack = this.solverPos > this.simState.solverStep;
     if ((puyoLayerBursting && correctState && showGarbageUpdate) || (showGarbageUpdate && popSkipped) || wentBack) {
+      // console.log(showGarbageUpdate, puyoLayerBursting, correctState, popSkipped, wentBack);
       this.solverPos = this.simState.solverStep;
       this.count = this.simState.solver.states[this.simState.solverStep].garbage;
       this.prepGarbageAnimation();
       this.setNumbers();
     }
+    // else if (showGarbageUpdate && this.simState.solver.states[this.simState.solverStep].garbage === 0) {
+    //   console.log('Yeah');
+    //   this.solverPos = this.simState.solverStep;
+    //   this.count = this.simState.solver.states[this.simState.solverStep].garbage;
+    //   this.prepGarbageAnimation();
+    //   this.setNumbers();
+    // }
 
     this.prevState = this.chainsim.animationState;
     this.animateGarbage();

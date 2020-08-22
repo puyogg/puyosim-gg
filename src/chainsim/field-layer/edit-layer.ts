@@ -45,7 +45,7 @@ export class EditLayer extends SimContainer {
 
     this.on('pointerover', () => (this.pointerOver = true));
     this.on('pointerdown', (event: PIXI.InteractionEvent) => {
-      if (this.chainsim.animationState === this.chainsim.idle) {
+      if (this.simState.mode === 'editor' && this.chainsim.animationState === this.chainsim.idle) {
         this.pointerDown = true;
         const pos = event.data.getLocalPosition(this);
         const { x, y } = pos;
@@ -55,7 +55,12 @@ export class EditLayer extends SimContainer {
       }
     });
     this.on('pointermove', (event: PIXI.InteractionEvent) => {
-      if (this.pointerOver && this.pointerDown && this.chainsim.animationState === this.chainsim.idle) {
+      if (
+        this.simState.mode === 'editor' &&
+        this.pointerOver &&
+        this.pointerDown &&
+        this.chainsim.animationState === this.chainsim.idle
+      ) {
         const pos = event.data.getLocalPosition(this);
         const { x, y } = pos;
         this.row = Math.floor(y / this.chainsim.state.pxSizing.cellHeight);

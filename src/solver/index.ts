@@ -361,9 +361,10 @@ class ChainSolver {
   }
 
   public resetToField(field: PuyoField): void {
+    const newField = new PuyoField(field.rows, field.cols, field.data);
     this.states = [
       {
-        puyoField: field,
+        puyoField: newField,
         dropDists: new NumField(this.rows, this.cols),
         garbageAdjacency: new NumField(this.rows, this.cols),
         isPopping: new BoolField(this.rows, this.cols),

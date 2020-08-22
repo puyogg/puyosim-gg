@@ -15,11 +15,11 @@ export interface WinState {
 export class NextWindow extends SimContainer {
   private toolTextures: PIXI.ITextureDictionary;
 
-  private winState: WinState;
+  public winState: WinState;
 
-  private window: Window;
+  public window: Window;
   private toggle: DrawerToggle;
-  private drawer: Drawer;
+  public drawer: Drawer;
   private colorSet: ColorSet;
 
   constructor(chainsim: Chainsim) {
@@ -32,7 +32,7 @@ export class NextWindow extends SimContainer {
       reset: false,
     };
 
-    this.window = new Window(chainsim);
+    this.window = new Window(chainsim, this.winState);
     this.addChild(this.window);
 
     this.drawer = new Drawer(chainsim, this.winState);
@@ -59,5 +59,10 @@ export class NextWindow extends SimContainer {
     this.colorSet = new ColorSet(chainsim, this.winState);
     this.colorSet.position.set(130, 40);
     this.addChild(this.colorSet);
+  }
+
+  public update(delta: number): void {
+    this.window.nextPuyos.update();
+    this.drawer.update();
   }
 }

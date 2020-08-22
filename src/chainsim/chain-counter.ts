@@ -72,10 +72,17 @@ class ChainCounter extends SimContainer {
       this.prevState === this.chainsim.animatePops && this.chainsim.animationState === this.chainsim.chainPaused;
     const wentBack = this.solverPos > this.simState.solverStep;
 
+    // console.log(this.simState.solver.states[this.simState.solverStep].chainLength);
     if ((puyoLayerBursting && correctState && showNumberUpdate) || (showNumberUpdate && popSkipped) || wentBack) {
       this.solverPos = this.simState.solverStep;
       this.chain = this.simState.solver.states[this.simState.solverStep].chainLength;
       this.prepAnimation();
+    } else if (this.simState.solver.states[this.simState.solverStep].chainLength === 0) {
+      this.firstDigit.visible = false;
+      this.secondDigit.visible = false;
+      this.chainText.visible = false;
+      this.chain = 0;
+      this.solverPos = 0;
     }
 
     this.prevState = this.chainsim.animationState;

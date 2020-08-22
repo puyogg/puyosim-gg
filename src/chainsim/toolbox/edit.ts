@@ -12,7 +12,7 @@ import { EditLayer } from '../field-layer';
 import { Frame } from '../frame';
 
 export class EditingTools extends SimContainer {
-  private toolboxTextures: PIXI.ITextureDictionary;
+  private toolTextures: PIXI.ITextureDictionary;
 
   private pageLeft: Sprite;
   private pageRight: Sprite;
@@ -30,7 +30,7 @@ export class EditingTools extends SimContainer {
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
-    this.toolboxTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
+    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
     this.editLayer = (this.chainsim.frame as Frame).editLayer;
 
@@ -45,7 +45,7 @@ export class EditingTools extends SimContainer {
     this.editLayer.currentLayer = 0;
 
     // Page Left, full width 238
-    this.pageLeft = new Sprite(this.toolboxTextures['picker_arrow_left.png']);
+    this.pageLeft = new Sprite(this.toolTextures['picker_arrow_left.png']);
     this.pageLeft.anchor.set(0.5);
     this.pageLeft.position.set(26, 330);
     this.pageLeft.interactive = true;
@@ -53,7 +53,7 @@ export class EditingTools extends SimContainer {
     this.addChild(this.pageLeft);
 
     // Page Right
-    this.pageRight = new Sprite(this.toolboxTextures['picker_arrow_right.png']);
+    this.pageRight = new Sprite(this.toolTextures['picker_arrow_right.png']);
     this.pageRight.anchor.set(0.5);
     this.pageRight.position.set(212, 330);
     this.pageRight.interactive = true;
@@ -61,7 +61,7 @@ export class EditingTools extends SimContainer {
     this.addChild(this.pageRight);
 
     // Layer Name
-    this.layerName = new Sprite(this.toolboxTextures['layer_main.png']);
+    this.layerName = new Sprite(this.toolTextures['layer_main.png']);
     this.layerName.anchor.set(0.5);
     this.layerName.position.set(119, 330);
     this.addChild(this.layerName);
@@ -78,7 +78,7 @@ export class EditingTools extends SimContainer {
     const page = this.pages[this.editLayer.currentLayer];
     page.visible = true;
     page.setCurrent(); // Set the page's current tool
-    this.layerName.texture = this.toolboxTextures[`layer_${page.name}.png`];
+    this.layerName.texture = this.toolTextures[`layer_${page.name}.png`];
   }
 
   public setNextPage(): void {
@@ -87,7 +87,7 @@ export class EditingTools extends SimContainer {
     const page = this.pages[this.editLayer.currentLayer];
     page.visible = true;
     page.setCurrent(); // Set the page's current tool
-    this.layerName.texture = this.toolboxTextures[`layer_${page.name}.png`];
+    this.layerName.texture = this.toolTextures[`layer_${page.name}.png`];
   }
 
   public setPrevPage(): void {
@@ -96,6 +96,6 @@ export class EditingTools extends SimContainer {
     const page = this.pages[this.editLayer.currentLayer];
     page.visible = true;
     page.setCurrent(); // Set the page's current tool
-    this.layerName.texture = this.toolboxTextures[`layer_${page.name}.png`];
+    this.layerName.texture = this.toolTextures[`layer_${page.name}.png`];
   }
 }

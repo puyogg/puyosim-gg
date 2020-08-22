@@ -4,6 +4,7 @@ import { SimContainer } from '../container';
 import { Chainsim } from '..';
 import { ASSET_PATH } from '../constants';
 import { Next } from './next';
+import { WinState } from '.';
 
 export class Window extends SimContainer {
   private layoutTextures: PIXI.ITextureDictionary;
@@ -11,10 +12,10 @@ export class Window extends SimContainer {
   private border: Sprite;
   private background: Sprite;
   // private windowMask: PIXI.Graphics;
-  private nextPuyos: Next;
+  public nextPuyos: Next;
   private windowMask: Sprite;
 
-  constructor(chainsim: Chainsim) {
+  constructor(chainsim: Chainsim, winState: WinState) {
     super(chainsim);
 
     this.layoutTextures = this.resources[`${ASSET_PATH}/layout.json`].textures as PIXI.ITextureDictionary;
@@ -22,7 +23,7 @@ export class Window extends SimContainer {
     const container = new PIXI.Container();
     this.addChild(container);
     this.background = new Sprite(this.layoutTextures['next_background_1p.png']);
-    this.nextPuyos = new Next(chainsim);
+    this.nextPuyos = new Next(chainsim, winState);
     this.windowMask = new Sprite(this.layoutTextures['next_background_1p_mask.png']);
     container.addChild(this.background, this.nextPuyos, this.windowMask);
     container.mask = this.windowMask;

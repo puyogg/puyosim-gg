@@ -8,7 +8,7 @@ import { Switch } from './switch';
 import { Frame } from '../frame';
 
 export class SimAndEdit extends SimContainer {
-  private toolboxTextures: PIXI.ITextureDictionary;
+  private toolTextures: PIXI.ITextureDictionary;
 
   private simTools: SimTools;
   private editingTools: EditingTools;
@@ -19,9 +19,9 @@ export class SimAndEdit extends SimContainer {
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
-    this.toolboxTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
+    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
-    this.simToolsBtn = new Switch(this.toolboxTextures['btn_sim.png'], this.toolboxTextures['btn_sim_pressed.png']);
+    this.simToolsBtn = new Switch(this.toolTextures['btn_sim.png'], this.toolTextures['btn_sim_pressed.png']);
     this.simToolsBtn.down = true;
     this.simToolsBtn.anchor.set(0.5);
     this.simToolsBtn.position.set(56, -36);
@@ -34,10 +34,11 @@ export class SimAndEdit extends SimContainer {
     });
     this.addChild(this.simToolsBtn);
 
-    this.editToolsBtn = new Switch(this.toolboxTextures['btn_edit.png'], this.toolboxTextures['btn_edit_pressed.png']);
+    this.editToolsBtn = new Switch(this.toolTextures['btn_puyo.png'], this.toolTextures['btn_puyo_pressed.png']);
     this.editToolsBtn.anchor.set(0.5);
     this.editToolsBtn.position.set(136, -36);
     this.editToolsBtn.on('pointerdown', () => {
+      this.chainsim.solverReset();
       this.simTools.visible = false;
       this.editingTools.visible = true;
       this.simToolsBtn.down = false;

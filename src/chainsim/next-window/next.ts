@@ -4,6 +4,8 @@ import { SimContainer } from '../container';
 import { Chainsim } from '..';
 import { ASSET_PATH } from '../constants';
 import { Coord } from '../position';
+import { PUYOTYPE, PUYONAME } from '../../solver/constants';
+import { WinState } from '.';
 
 export class Next extends SimContainer {
   private puyoTextures: PIXI.ITextureDictionary;
@@ -13,12 +15,20 @@ export class Next extends SimContainer {
   private targetCoords: Coord[];
   private ticker: number;
 
-  constructor(chainsim: Chainsim) {
+  private prevPos: number;
+  private poolChanged: boolean;
+
+  private winState: WinState;
+
+  constructor(chainsim: Chainsim, winState: WinState) {
     super(chainsim);
 
     this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
 
     this.ticker = 0;
+    this.prevPos = 0;
+    this.poolChanged = false;
+    this.winState = winState;
 
     this.coords = [
       { x: 54, y: 124 },
@@ -48,15 +58,52 @@ export class Next extends SimContainer {
       const { x, y } = this.coords[i];
       sprite.position.set(x, y);
       sprite.scale.set(i < 2 ? 1 : this.scaling);
+      sprite.interactive = true;
+      sprite.buttonMode = true;
+      sprite.on('pointerdown', () => {
+        if (this.chainsim.nextWindow?.drawer.visible) {
+          const poolIdx = (this.simState.poolPos + i) % this.simState.pool.length;
+          const tool = this.winState.currentTool;
+          const reset = this.winState.reset;
+          if (reset) {
+            this.simState.pool[poolIdx] = this.simState.origPool[poolIdx];
+          } else {
+            this.simState.pool[poolIdx] = tool;
+          }
+        }
+        this.simState.poolChanged = !this.simState.poolChanged;
+      });
       this.addChild(this.sprites[i]);
     }
 
-    PIXI.Ticker.shared.add(() => this.animate());
+    this.refreshSprites();
   }
 
-  public animate(): void {
+  public refreshSprites(): void {
+    const pool = this.simState.pool;
+    const poolPos = this.simState.poolPos;
+
+    for (let i = 0; i < 6; i++) {
+      const name = PUYONAME[pool[(poolPos + i) % pool.length] as PUYOTYPE];
+      const sprite = this.sprites[i];
+      sprite.texture = this.puyoTextures[`${name}_0.png`];
+      const { x, y } = this.coords[i];
+      sprite.position.set(x, y);
+      sprite.scale.set(i < 2 ? 1 : this.scaling);
+    }
+  }
+
+  public update(): void {
+    if (this.prevPos !== this.simState.poolPos || this.poolChanged !== this.simState.poolChanged) {
+      this.refreshSprites();
+    }
+    this.prevPos = this.simState.poolPos;
+    this.poolChanged = this.simState.poolChanged;
+  }
+
+  public animate(): boolean {
     const t = this.ticker + 1;
-    const d = 60; // Duration
+    const d = 8; // Duration
 
     for (let i = 0; i < this.coords.length; i++) {
       const diff: Coord = {
@@ -73,6 +120,15 @@ export class Next extends SimContainer {
       }
     }
 
-    this.ticker = (this.ticker + 1) % d;
+    const finished = t >= d;
+    this.ticker += 1;
+
+    if (finished) {
+      // this.simState.slidePos += 1;
+      // this.simState.poolPos = (this.simState.poolPos + 2) % this.simState.pool.length;
+      this.ticker = 0;
+      // this.refreshSprites();
+    }
+    return finished;
   }
 }

@@ -1,8 +1,8 @@
 import { Sprite } from 'pixi.js';
 
 export class AxisPuyo extends Sprite {
-  private normalTexture: PIXI.Texture;
-  private flashTexture: PIXI.Texture;
+  public normalTexture: PIXI.Texture;
+  public flashTexture: PIXI.Texture;
 
   private _isFlashing: boolean;
 

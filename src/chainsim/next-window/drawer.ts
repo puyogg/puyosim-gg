@@ -19,8 +19,12 @@ export class Drawer extends SimContainer {
   private drawer: Sprite;
   private editor: NextEditor;
   private numbers: NextNumber[];
+  private toolCursor: Sprite;
   private puyos: Sprite[];
   private tools: NextTool[];
+
+  private prevPos: number;
+  private poolChanged: boolean;
 
   constructor(chainsim: Chainsim, winState: WinState) {
     super(chainsim);
@@ -30,6 +34,9 @@ export class Drawer extends SimContainer {
 
     // Enable interactivity to block touch events to the editor/sim
     this.interactive = true;
+
+    this.prevPos = 0;
+    this.poolChanged = false;
 
     this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
     this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
@@ -60,20 +67,39 @@ export class Drawer extends SimContainer {
         this.puyos[i].anchor.set(0.5);
         this.puyos[i].x = c % 2 === 0 ? 122 : 164;
         this.puyos[i].y = 40 + r * 62;
+        this.puyos[i].interactive = true;
+        this.puyos[i].buttonMode = true;
+        this.puyos[i].on('pointerdown', () => {
+          const poolIdx = (this.simState.poolPos + i + 4) % this.simState.pool.length;
+          const tool = this.winState.currentTool;
+          const reset = this.winState.reset;
+          if (reset) {
+            this.simState.pool[poolIdx] = this.simState.origPool[poolIdx];
+          } else {
+            this.simState.pool[poolIdx] = tool;
+          }
+          this.simState.poolChanged = !this.simState.poolChanged;
+        });
         this.addChild(this.puyos[i]);
       }
     }
 
+    this.toolCursor = new Sprite(this.toolTextures['current_tool.png']);
+    this.toolCursor.anchor.set(0.5);
+    this.toolCursor.scale.set(1);
+    this.toolCursor.position.set(36, 35);
+    this.addChild(this.toolCursor);
+
     this.tools = [];
     for (let i = 0; i < 7; i++) {
       const type = i as PUYOTYPE;
-      this.tools[i] = new NextTool(this.puyoTextures[`${PUYONAME[type]}_0.png`]);
+      this.tools[i] = new NextTool(this.puyoTextures[`${PUYONAME[type]}_0.png`], this.toolCursor, type, this.winState);
       this.tools[i].x = 36;
       this.tools[i].y = 35 + i * 53;
       this.addChild(this.tools[i]);
     }
     this.tools[0].texture = this.toolTextures['editor_x.png'];
-    this.tools[7] = new NextTool(this.toolTextures['return.png']);
+    this.tools[7] = new NextTool(this.toolTextures['return.png'], this.toolCursor, -1, this.winState);
     this.tools[7].x = 36;
     this.tools[7].y = 35 + 7 * 53;
     this.addChild(this.tools[7]);
@@ -89,5 +115,13 @@ export class Drawer extends SimContainer {
       const puyo = this.simState.pool[poolIdx] as PUYOTYPE;
       this.puyos[i].texture = this.puyoTextures[`${PUYONAME[puyo]}_0.png`];
     }
+  }
+
+  public update(): void {
+    if (this.prevPos !== this.simState.poolPos || this.poolChanged !== this.simState.poolChanged) {
+      this.refreshSprites();
+    }
+    this.prevPos = this.simState.poolPos;
+    this.poolChanged = this.simState.poolChanged;
   }
 }

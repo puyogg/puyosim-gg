@@ -28,6 +28,8 @@ class PuyoLayer extends Layer {
   public runningPopAnimation: boolean; // Need to track this for the score display
   public runningBurstAnimation: boolean; // Need to track this for garbage tray & chain counter
 
+  private prevSlide: number;
+
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
@@ -69,7 +71,15 @@ class PuyoLayer extends Layer {
       }
     }
 
-    this.refreshSprites(this.simState.slides[this.simState.slidePos].puyo);
+    this.tempField.copyFrom(this.simState.slides[this.simState.slidePos].puyo);
+    this.refreshSprites(this.tempField);
+  }
+
+  public update(): void {
+    if (this.prevSlide !== this.simState.slidePos) {
+      this.refreshSprites(this.simState.slides[this.simState.slidePos].puyo);
+    }
+    this.prevSlide = this.simState.slidePos;
   }
 
   public refreshSprites(field: PuyoField): void {
@@ -290,7 +300,6 @@ class PuyoLayer extends Layer {
               this.sprites[newR * this.cols + c - 1].texture = this.puyoTextures[`${nName}_${nConnection}.png`];
             }
             this.sprites[newR * this.cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_${connection}.png`];
-            console.log(r, newR, c, connection);
             this.connectivity.set(newR, c, connection);
           } else {
             this.sprites[newR * this.cols + c].texture = this.puyoTextures[`${PUYONAME[puyo]}_0.png`];

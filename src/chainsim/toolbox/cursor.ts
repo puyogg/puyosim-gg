@@ -10,7 +10,7 @@ export class PageCursor extends Page {
 
     this.name = 'cursor';
 
-    const texture = this.toolboxTextures[`cursor.png`];
+    const texture = this.toolTextures[`cursor.png`];
     this.tool = new ToolSprite(texture, this.toolCursor, true, this, this.editLayer);
     this.tool.anchor.set(0.5);
     this.tool.x = 48;

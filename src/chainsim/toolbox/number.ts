@@ -30,7 +30,7 @@ export class PageNumber extends Page {
     this.toolNumber.buttonMode = true;
     this.numContainer.addChild(this.toolNumber);
 
-    this.minus = new Sprite(this.toolboxTextures[`picker_arrow_left.png`]);
+    this.minus = new Sprite(this.toolTextures[`picker_arrow_left.png`]);
     this.minus.anchor.set(0.5);
     this.minus.scale.set(0.9);
     this.minus.position.set(-80, 0);
@@ -38,7 +38,7 @@ export class PageNumber extends Page {
     this.minus.buttonMode = true;
     this.numContainer.addChild(this.minus);
 
-    this.plus = new Sprite(this.toolboxTextures[`picker_arrow_right.png`]);
+    this.plus = new Sprite(this.toolTextures[`picker_arrow_right.png`]);
     this.plus.anchor.set(0.5);
     this.plus.scale.set(0.9);
     this.plus.position.set(80, 0);
