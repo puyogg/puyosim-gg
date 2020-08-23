@@ -12,6 +12,7 @@ import { ActivePairContainer } from './active-pair';
 import { PuyoField, NumField, BoolField } from '../solver/field';
 import { SlideChanger } from './slide';
 import { get2d } from '../solver/helper';
+import { NoteWindow } from './note';
 
 /** Subset of options available at https://pixijs.download/v5.3.3/docs/PIXI.Application.html */
 interface PixiOptions {
@@ -52,6 +53,8 @@ class Chainsim {
   public activePair: ActivePairContainer | undefined;
 
   public slideChanger: SlideChanger | undefined;
+
+  public noteWindow: NoteWindow | undefined;
 
   // Function that plays on every tick. Swap it out with other methods.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -104,6 +107,7 @@ class Chainsim {
     // so  users don't get trapped inside the chainsim
     this.app.renderer.plugins.interaction.autoPreventDefault = false;
     this.app.renderer.view.style.touchAction = 'manipulation';
+    this.app.renderer.view.style.width = '100%';
 
     //// FIELD ////
     this.frame = new Frame(this);
@@ -163,6 +167,12 @@ class Chainsim {
     this.slideChanger.scale.set(0.76);
     this.app.ticker.add(() => this.slideChanger?.update());
     this.app.stage.addChild(this.slideChanger);
+
+    //// Note Window ////
+    this.noteWindow = new NoteWindow(this);
+    // this.noteWindow.position.set(315, 900);
+    this.noteWindow.position.set(0, 0);
+    this.app.stage.addChild(this.noteWindow);
 
     this.animationState = this.idle;
   }

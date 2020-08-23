@@ -48,6 +48,8 @@ class PuyoLayer extends Layer {
     this.runningPopAnimation = false;
     this.runningBurstAnimation = false;
 
+    this.prevSlide = 0;
+
     this.init();
     // Set interaction handlers
     this.setEventHandlers();
