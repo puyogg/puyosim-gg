@@ -12,25 +12,21 @@ import { EditLayer } from '../field-layer';
 import { Frame } from '../frame';
 
 export class EditingTools extends SimContainer {
-  private toolTextures: PIXI.ITextureDictionary;
-
   private pageLeft: Sprite;
   private pageRight: Sprite;
   private layerName: Sprite;
 
-  private pageMain: PageMain;
-  private pageShadow: PageShadow;
-  private pageArrow: PageArrow;
-  private pageCursor: PageCursor;
-  private pageNumber: PageNumber;
-  private pages: Page[];
+  public pageMain: PageMain;
+  public pageShadow: PageShadow;
+  public pageArrow: PageArrow;
+  public pageCursor: PageCursor;
+  public pageNumber: PageNumber;
+  public pages: Page[];
 
   private editLayer: EditLayer;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
-
-    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
     this.editLayer = (this.chainsim.frame as Frame).editLayer;
 

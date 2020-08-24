@@ -1,14 +1,11 @@
 import { SimContainer } from '../container';
-import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
 import { Button } from './button';
 import { ActivePairContainer } from '../active-pair';
 import { isNone } from '../../solver/helper';
-import { Frame } from '../frame';
 import { PuyoField } from '../../solver/field';
 
 export class GameTools extends SimContainer {
-  private toolTextures: PIXI.ITextureDictionary;
   private activePair: ActivePairContainer;
 
   private btnLeft: Button;
@@ -21,8 +18,6 @@ export class GameTools extends SimContainer {
     super(chainsim);
 
     this.activePair = this.chainsim.activePair as ActivePairContainer;
-
-    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
     this.btnRotL = new Button(this.toolTextures['btn_rotateleft.png'], this.toolTextures['btn_rotateleft_pressed.png']);
     this.btnRotL.anchor.set(0.5);

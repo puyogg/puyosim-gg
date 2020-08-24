@@ -34,6 +34,9 @@ export class DrawerToggle extends Sprite {
       this.active = !this.active;
       this.texture = this.up;
     });
+    this.on('pointerupoutside', () => {
+      this.texture = this.up;
+    });
   }
 
   set active(bool: boolean) {

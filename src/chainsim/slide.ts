@@ -1,14 +1,9 @@
 import { SimContainer } from './container';
-import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
-import { ASSET_PATH } from './constants';
 import { Chainsim } from '.';
 import { Number3Digit } from './number';
 
 export class SlideChanger extends SimContainer {
-  private toolTextures: PIXI.ITextureDictionary;
-  private numTextures: PIXI.ITextureDictionary;
-
   private slide: Sprite;
   private prevArrow: Sprite;
   private nextArrow: Sprite;
@@ -20,8 +15,6 @@ export class SlideChanger extends SimContainer {
     super(chainsim);
 
     // Get references to textures
-    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
-    this.numTextures = this.resources[`${ASSET_PATH}/scoreFont.json`].textures as PIXI.ITextureDictionary;
 
     this.slide = new Sprite(this.toolTextures['slide.png']);
     this.slide.position.set(-30, 0);

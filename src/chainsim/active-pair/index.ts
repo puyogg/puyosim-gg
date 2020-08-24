@@ -1,17 +1,13 @@
-import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
 import { PositionMatrix, Coord } from '../position';
 import { AxisPuyo } from './axis';
-import { ASSET_PATH } from '../constants';
 import { Pos } from '../../solver';
 import { isNone, isColored } from '../../solver/helper';
 import { PUYOTYPE, PUYONAME } from '../../solver/constants';
 
 export class ActivePairContainer extends SimContainer {
-  private puyoTextures: PIXI.ITextureDictionary;
-
   public cellPos: PositionMatrix;
   public rows: number;
   public cols: number;
@@ -38,8 +34,6 @@ export class ActivePairContainer extends SimContainer {
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
-
-    this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
 
     // const graphics = new PIXI.Graphics();
     // graphics.beginFill(0x00ffff);
@@ -128,34 +122,41 @@ export class ActivePairContainer extends SimContainer {
     });
   }
 
+  public refreshSprites(): void {
+    const pool = this.simState.pool;
+    const poolPos = this.simState.poolPos;
+
+    const axisPuyo = pool[(poolPos - 2 + pool.length) % pool.length] as PUYOTYPE;
+    this.axisColor = axisPuyo;
+    const axisName = PUYONAME[axisPuyo];
+    this.axisPuyo.texture = this.puyoTextures[`${axisName}_0.png`];
+    this.axisPuyo.normalTexture = this.puyoTextures[`${axisName}_0.png`];
+    this.axisPuyo.flashTexture = isColored(axisPuyo)
+      ? this.puyoTextures[`${axisName}_outlined.png`]
+      : this.puyoTextures[`${axisName}_0.png`];
+
+    // Need to update spritesheet to account for garbage blip
+    this.axisBlip.texture = this.puyoTextures[`${axisName}_blip.png`];
+
+    const freePuyo = pool[(poolPos - 1 + pool.length) % pool.length] as PUYOTYPE;
+    this.freeColor = freePuyo;
+    const freeName = PUYONAME[freePuyo];
+    this.freePuyo.texture = this.puyoTextures[`${freeName}_0.png`];
+    this.freeBlip.texture = this.puyoTextures[`${freeName}_blip.png`];
+  }
+
   public update(delta: number): void {
+    // If the game returned to its idle state... refreshSprites
     if (
       (this.prevState !== this.chainsim.idle && this.chainsim.animationState === this.chainsim.idle) ||
       this.poolChanged !== this.simState.poolChanged ||
       this.prevSlide !== this.simState.slidePos
     ) {
-      const pool = this.simState.pool;
-      const poolPos = this.simState.poolPos;
-
-      const axisPuyo = pool[(poolPos - 2 + pool.length) % pool.length] as PUYOTYPE;
-      this.axisColor = axisPuyo;
-      const axisName = PUYONAME[axisPuyo];
-      this.axisPuyo.texture = this.puyoTextures[`${axisName}_0.png`];
-      this.axisPuyo.normalTexture = this.puyoTextures[`${axisName}_0.png`];
-      this.axisPuyo.flashTexture = isColored(axisPuyo)
-        ? this.puyoTextures[`${axisName}_outlined.png`]
-        : this.puyoTextures[`${axisName}_0.png`];
-
-      // Need to update spritesheet to account for garbage blip
-      this.axisBlip.texture = this.puyoTextures[`${axisName}_blip.png`];
-
-      const freePuyo = pool[(poolPos - 1 + pool.length) % pool.length] as PUYOTYPE;
-      this.freeColor = freePuyo;
-      const freeName = PUYONAME[freePuyo];
-      this.freePuyo.texture = this.puyoTextures[`${freeName}_0.png`];
-      this.freeBlip.texture = this.puyoTextures[`${freeName}_blip.png`];
+      this.refreshSprites();
     }
 
+    // Decide whether to truly show the Puyos and blips.
+    // Don't show it on Move 0, during editing mode, or while chains are happening.
     const slidePos = this.simState.slidePos;
     if (slidePos === 0) {
       this.visible = false;

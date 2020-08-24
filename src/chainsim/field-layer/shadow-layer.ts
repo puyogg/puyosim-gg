@@ -6,11 +6,13 @@ import { Chainsim } from '..';
 
 class ShadowLayer extends Layer {
   private slidePos: number;
+  public tempField: PuyoField;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
     this.slidePos = this.simState.slidePos;
+    this.tempField = new PuyoField(this.rows, this.cols);
 
     this.init();
   }
@@ -47,6 +49,8 @@ class ShadowLayer extends Layer {
         sprite.texture = this.puyoTextures[`${name}_0.png`];
       }
     }
+
+    this.tempField.copyFrom(field);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1108,7 +1108,7 @@
   "meta": {
     "app": "http://www.puyonexus.com",
     "version": "1.0",
-    "image": "/sim_assets/img/puyo/puyo_aqua.png",
+    "image": "/sim_assets/img/puyo/puyo_gummy.png",
     "format": "RGBA8888",
     "size": { "w": 2048, "h": 1024 },
     "scale": "1"

@@ -1,13 +1,9 @@
-import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
-import { ASSET_PATH } from '../constants';
 import { WinState } from '.';
 
 export class NextNumber extends SimContainer {
-  private numTextures: PIXI.ITextureDictionary;
-
   private winState: WinState;
   private offset: number;
 
@@ -20,9 +16,6 @@ export class NextNumber extends SimContainer {
     // Set reference to window editor state
     this.winState = winState;
     this.offset = offset;
-
-    // Set texture reference
-    this.numTextures = this.resources[`${ASSET_PATH}/scoreFont.json`].textures as PIXI.ITextureDictionary;
 
     // Set 3 digits
     this.numbers = [];

@@ -1,9 +1,7 @@
 import { Page } from './page';
-import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
 import { PUYOTYPE } from '../../solver/constants';
 import { ToolSprite } from './tool';
-import { Frame } from '../frame';
 
 const names: string[][] = [
   ['red', 'green', 'blue'],
@@ -18,15 +16,12 @@ const toolValue: PUYOTYPE[][] = [
 ];
 
 export class PageMain extends Page {
-  private puyoTextures: PIXI.ITextureDictionary;
   private puyoTools: ToolSprite[][];
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
     this.name = 'main';
-
-    this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
 
     this.puyoTools = [];
     for (let r = 0; r < names.length; r++) {
@@ -42,6 +37,18 @@ export class PageMain extends Page {
         this.puyoTools[r][c] = tool;
         this.tools.push(tool);
         this.addChild(tool);
+      }
+    }
+  }
+
+  /** Update the textures the tool buttons use */
+  public refreshSprites(): void {
+    for (let r = 0; r < names.length; r++) {
+      for (let c = 0; c < names[r].length; c++) {
+        const name = names[r][c];
+        const texture = this.puyoTextures[`${name}_0.png`];
+        const tool = this.puyoTools[r][c];
+        tool.texture = texture;
       }
     }
   }

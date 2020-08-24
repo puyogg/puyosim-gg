@@ -10,10 +10,6 @@ class GarbageTray extends SimContainer {
   // Access to other components
   private puyoLayer: PuyoLayer;
 
-  private trayTextures: PIXI.ITextureDictionary;
-  private puyoTextures: PIXI.ITextureDictionary;
-  private numTextures: PIXI.ITextureDictionary;
-
   private icons: Sprite[];
   private numbers: Sprite[];
   private tray: Sprite;
@@ -30,10 +26,6 @@ class GarbageTray extends SimContainer {
     this.puyoLayer = puyoLayer;
     this.prevState = this.chainsim.idle;
     this.solverPos = 0;
-
-    this.trayTextures = this.resources[`${ASSET_PATH}/layout.json`].textures as PIXI.ITextureDictionary;
-    this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
-    this.numTextures = this.resources[`${ASSET_PATH}/scoreFont.json`].textures as PIXI.ITextureDictionary;
 
     // Garbage Tray
     this.tray = new Sprite(this.trayTextures['garbage_tray.png']);
@@ -75,6 +67,18 @@ class GarbageTray extends SimContainer {
   public toggleDisplay(showCount?: boolean): void {
     if (showCount === undefined) {
       this.showCount = !this.showCount;
+    }
+  }
+
+  public refreshSprites(): void {
+    const iconNames = countGarbageIcons(this.count);
+
+    for (let i = 0; i < this.icons.length; i++) {
+      this.icons[i].texture = this.puyoTextures['spacer_0.png'];
+    }
+
+    for (let i = 0; i < iconNames.length; i++) {
+      this.icons[i].texture = this.puyoTextures[iconNames[i]];
     }
   }
 

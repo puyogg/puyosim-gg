@@ -1,14 +1,11 @@
-import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
-import { ASSET_PATH } from '../constants';
 import { Coord } from '../position';
 import { PUYOTYPE, PUYONAME } from '../../solver/constants';
 import { WinState } from '.';
 
 export class Next extends SimContainer {
-  private puyoTextures: PIXI.ITextureDictionary;
   private sprites: Sprite[];
   private coords: Coord[];
   private scaling: number;
@@ -22,8 +19,6 @@ export class Next extends SimContainer {
 
   constructor(chainsim: Chainsim, winState: WinState) {
     super(chainsim);
-
-    this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
 
     this.ticker = 0;
     this.prevPos = 0;

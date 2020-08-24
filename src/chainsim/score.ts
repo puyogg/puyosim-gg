@@ -1,12 +1,9 @@
 import { SimContainer } from './container';
-import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
-import { ASSET_PATH } from './constants';
 import { PuyoLayer } from './field-layer';
 import { Chainsim } from '.';
 
 class ScoreDisplay extends SimContainer {
-  private textures: PIXI.ITextureDictionary;
   private sprites: Sprite[];
   private puyoLayer: PuyoLayer;
   private score: number;
@@ -16,7 +13,6 @@ class ScoreDisplay extends SimContainer {
   constructor(chainsim: Chainsim, puyoLayer: PuyoLayer) {
     super(chainsim);
 
-    this.textures = this.resources[`${ASSET_PATH}/scoreFont.json`].textures as PIXI.ITextureDictionary;
     this.sprites = [];
     this.puyoLayer = puyoLayer;
     this.chainsim = chainsim;
@@ -25,7 +21,7 @@ class ScoreDisplay extends SimContainer {
 
     // Initialize sprites
     for (let i = 0; i < 8; i++) {
-      this.sprites[i] = new Sprite(this.textures['score_0.png']);
+      this.sprites[i] = new Sprite(this.numTextures['score_0.png']);
       this.sprites[i].scale.set(0.8, 0.8);
       this.sprites[i].anchor.set(0.5);
       this.sprites[i].x = this.sprites[i].width * 0.9 * i;
@@ -36,6 +32,12 @@ class ScoreDisplay extends SimContainer {
 
   public update(): void {
     const showScoreUpdate = this.score !== this.simState.solver.states[this.simState.solverStep].score;
+
+    if (this.chainsim.animationState === this.chainsim.idle) {
+      this.score = 0;
+      this.showScore();
+    }
+
     // The displayed score needs to be slightly older than what's in the solver state
     // so it can display without glitching during the popping animation.
     if (this.chainsim.animationState !== this.chainsim.animatePops) {
@@ -64,7 +66,7 @@ class ScoreDisplay extends SimContainer {
 
   private reset(): void {
     for (let i = 0; i < 8; i++) {
-      this.sprites[i].texture = this.textures['score_0.png'];
+      this.sprites[i].texture = this.numTextures['score_0.png'];
       this.sprites[i].x = this.sprites[i].width * 0.9 * i;
       this.sprites[i].y = 0;
       this.sprites[i].visible = true;
@@ -78,7 +80,7 @@ class ScoreDisplay extends SimContainer {
     const diff = 8 - scoreText.length;
 
     for (let i = diff; i < 8; i++) {
-      this.sprites[i].texture = this.textures[`score_${scoreText[i - diff]}.png`];
+      this.sprites[i].texture = this.numTextures[`score_${scoreText[i - diff]}.png`];
     }
   }
 
@@ -90,16 +92,16 @@ class ScoreDisplay extends SimContainer {
     this.sprites.forEach((sprite) => (sprite.visible = false));
 
     this.sprites[4].visible = true;
-    this.sprites[4].texture = this.textures['score_x.png'];
+    this.sprites[4].texture = this.numTextures['score_x.png'];
 
     for (let i = 1 + (3 - left.length); i < 4; i++) {
       this.sprites[i].visible = true;
-      this.sprites[i].texture = this.textures[`score_${left[i - (1 + (3 - left.length))]}.png`];
+      this.sprites[i].texture = this.numTextures[`score_${left[i - (1 + (3 - left.length))]}.png`];
     }
 
     for (let i = 5 + (3 - right.length); i < 8; i++) {
       this.sprites[i].visible = true;
-      this.sprites[i].texture = this.textures[`score_${right[i - (5 + (3 - right.length))]}.png`];
+      this.sprites[i].texture = this.numTextures[`score_${right[i - (5 + (3 - right.length))]}.png`];
     }
   }
 }

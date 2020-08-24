@@ -1,8 +1,6 @@
-import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
-import { ASSET_PATH } from '../constants';
 import { NextEditor } from './editor';
 import { WinState } from '.';
 import { NextNumber } from './next-number';
@@ -10,10 +8,6 @@ import { PUYONAME, PUYOTYPE } from '../../solver/constants';
 import { NextTool } from './tool';
 
 export class Drawer extends SimContainer {
-  private puyoTextures: PIXI.ITextureDictionary;
-  private toolTextures: PIXI.ITextureDictionary;
-  private layoutTextures: PIXI.ITextureDictionary;
-
   private winState: WinState;
 
   private drawer: Sprite;
@@ -37,10 +31,6 @@ export class Drawer extends SimContainer {
 
     this.prevPos = 0;
     this.poolChanged = false;
-
-    this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
-    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
-    this.layoutTextures = this.resources[`${ASSET_PATH}/layout.json`].textures as PIXI.ITextureDictionary;
 
     this.drawer = new Sprite(this.layoutTextures['next_big_container.png']);
     this.addChild(this.drawer);
@@ -115,6 +105,13 @@ export class Drawer extends SimContainer {
       const puyo = this.simState.pool[poolIdx] as PUYOTYPE;
       this.puyos[i].texture = this.puyoTextures[`${PUYONAME[puyo]}_0.png`];
     }
+
+    for (let i = 0; i < 7; i++) {
+      const type = i as PUYOTYPE;
+      this.tools[i].texture = this.puyoTextures[`${PUYONAME[type]}_0.png`];
+    }
+    this.tools[0].texture = this.toolTextures['editor_x.png'];
+    this.tools[7].texture = this.toolTextures['return.png'];
   }
 
   public update(): void {

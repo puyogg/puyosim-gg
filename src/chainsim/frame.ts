@@ -1,4 +1,3 @@
-import { PUYOTYPE } from '../solver/constants';
 import { SimContainer } from './container';
 import { PuyoLayer, ShadowLayer, ArrowLayer, CursorLayer, NumberLayer, Layer, EditLayer } from './field-layer';
 import { ASSET_PATH } from './constants';

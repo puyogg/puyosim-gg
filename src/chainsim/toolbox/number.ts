@@ -1,12 +1,9 @@
 import { Page } from './page';
-import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
-import * as PIXI from 'pixi.js';
 import { Sprite, Container } from 'pixi.js';
 import { ToolNumber } from './tool';
 
 export class PageNumber extends Page {
-  private numTextures: PIXI.ITextureDictionary;
   private toolNumber: ToolNumber;
   private minus: Sprite;
   private plus: Sprite;
@@ -18,7 +15,6 @@ export class PageNumber extends Page {
     super(chainsim);
 
     this.name = 'number';
-    this.numTextures = this.resources[`${ASSET_PATH}/scoreFont.json`].textures as PIXI.ITextureDictionary;
 
     // Wrapper container for better relative positioning
     this.numContainer = new Container();

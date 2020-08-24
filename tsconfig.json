@@ -2,25 +2,19 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "ESNext",
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
+    "lib": ["ESNext", "DOM"],
     "jsx": "react",
     "sourceMap": true,
     "strict": true,
     "moduleResolution": "Node",
     "baseUrl": "./src",
     "paths": {
-      "~/*": ["./*"],
+      "~/*": ["./*"]
     },
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "typeRoots": ["node_modules/@types"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }

@@ -1,7 +1,5 @@
-import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { SimContainer } from '../container';
-import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
 import { PUYOTYPE } from '../../solver/constants';
 import { Button } from './button';
@@ -10,7 +8,6 @@ import { Frame } from '../frame';
 import { EditLayer } from '../field-layer';
 
 export abstract class Page extends SimContainer {
-  public toolTextures: PIXI.ITextureDictionary;
   public currentTool: PUYOTYPE | number | boolean;
   public toolCursor: Sprite;
   public delete: ToolSprite;
@@ -22,7 +19,6 @@ export abstract class Page extends SimContainer {
     super(chainsim);
 
     this.currentTool = 0;
-    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
     this.tools = [];
     this.editLayer = (this.chainsim.frame as Frame).editLayer;

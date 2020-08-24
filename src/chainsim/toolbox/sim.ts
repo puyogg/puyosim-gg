@@ -1,11 +1,8 @@
 import { SimContainer } from '../container';
-import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
 import { Button } from './button';
 
 class SimTools extends SimContainer {
-  private toolTextures: PIXI.ITextureDictionary;
-
   private btnShare: Button;
   private btnReset: Button;
   private btnBack: Button;
@@ -15,8 +12,6 @@ class SimTools extends SimContainer {
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
-
-    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
     this.btnShare = new Button(this.toolTextures['btn_share.png'], this.toolTextures['btn_share_pressed.png']);
     this.btnShare.anchor.set(0.5);

@@ -7,12 +7,13 @@ import { GarbageTray } from './garbage-tray';
 import { ChainCounter } from './chain-counter';
 import { Toolbox } from './toolbox';
 import { NextWindow } from './next-window';
-import { OptionButtons } from './options';
+import { OptionButtons } from './meta-options';
 import { ActivePairContainer } from './active-pair';
 import { PuyoField, NumField, BoolField } from '../solver/field';
 import { SlideChanger } from './slide';
 import { get2d } from '../solver/helper';
 import { NoteWindow } from './note';
+import { OptionsMenu } from './options';
 
 /** Subset of options available at https://pixijs.download/v5.3.3/docs/PIXI.Application.html */
 interface PixiOptions {
@@ -33,14 +34,15 @@ interface PixiOptions {
  */
 class Chainsim {
   public app: PIXI.Application;
-  private loader: PIXI.Loader;
+  public root: PIXI.Container; // Gets blurred when the options menu appears.
+  public loader: PIXI.Loader;
   private simLoaded: boolean;
   public state: AppState;
   public resources: PIXI.IResourceDictionary;
 
   public frame: Frame | undefined;
   private scoreDisplay: ScoreDisplay | undefined;
-  private garbageTray: GarbageTray | undefined;
+  public garbageTray: GarbageTray | undefined;
 
   public toolbox: Toolbox | undefined;
   private chainCounter: ChainCounter | undefined;
@@ -56,6 +58,8 @@ class Chainsim {
 
   public noteWindow: NoteWindow | undefined;
 
+  public optionsMenu: OptionsMenu | undefined;
+
   // Function that plays on every tick. Swap it out with other methods.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public animationState: (delta: number, ...args: any[]) => void;
@@ -63,6 +67,8 @@ class Chainsim {
   constructor(options: PixiOptions, slideData?: LoadableSlideData) {
     this.simLoaded = false;
     this.app = new PIXI.Application(options);
+    this.root = new PIXI.Container();
+    this.app.stage.addChild(this.root);
 
     // Construct the starting state. Some stuff might've been passed
     // in as a parameter...
@@ -80,13 +86,16 @@ class Chainsim {
     // Run the asset loader
     this.loader
       .add(`${ASSET_PATH}/arle_bg.png`)
+      .add(`${ASSET_PATH}/save_wheel.png`)
+      .add(`${ASSET_PATH}/bubble.png`)
       .add(`${ASSET_PATH}/puyo.json`)
       .add(`${ASSET_PATH}/layout.json`)
       .add(`${ASSET_PATH}/scoreFont.json`)
       .add(`${ASSET_PATH}/chain_font.json`)
       .add(`${ASSET_PATH}/tools.json`)
+      .add(`${ASSET_PATH}/puyotrim.json`)
       .load()
-      .onComplete.add(() => {
+      .onComplete.once(() => {
         this.simLoaded = true;
         this.init();
         this.app.ticker.add((delta: number) => this.gameLoop(delta));
@@ -99,10 +108,10 @@ class Chainsim {
   private init(): void {
     // Test background
     const graphics = new PIXI.Graphics();
-    graphics.beginFill(0x00ff00);
+    graphics.beginFill(0x22dd77);
     graphics.drawRect(0, 0, 630, 1000);
     graphics.endFill();
-    this.app.stage.addChild(graphics);
+    this.root.addChild(graphics);
 
     // so  users don't get trapped inside the chainsim
     this.app.renderer.plugins.interaction.autoPreventDefault = false;
@@ -113,39 +122,39 @@ class Chainsim {
     this.frame = new Frame(this);
     this.frame.x = 0;
     this.frame.y = 132;
-    this.app.stage.addChild(this.frame);
+    this.root.addChild(this.frame);
     this.app.ticker.add((delta: number) => this.frame?.update(delta));
 
     this.scoreDisplay = new ScoreDisplay(this, this.frame.puyoLayer);
     this.scoreDisplay.x = 32;
     this.scoreDisplay.y = 935;
-    this.app.stage.addChild(this.scoreDisplay);
+    this.root.addChild(this.scoreDisplay);
     this.app.ticker.add(() => this.scoreDisplay?.update());
 
     this.garbageTray = new GarbageTray(this, this.frame.puyoLayer);
     this.garbageTray.x = 337;
     this.garbageTray.y = 915;
     this.garbageTray.scale.set(0.7, 0.7);
-    this.app.stage.addChild(this.garbageTray);
+    this.root.addChild(this.garbageTray);
     this.app.ticker.add((delta: number) => this.garbageTray?.update(delta));
 
     //// ACTIVE PAIR ////
     this.activePair = new ActivePairContainer(this);
-    this.activePair.x = this.frame.puyoLayer.toGlobal(this.app.stage).x;
-    this.activePair.y = this.frame.puyoLayer.toGlobal(this.app.stage).y - 60 * 2;
+    this.activePair.x = this.frame.puyoLayer.toGlobal(this.root).x;
+    this.activePair.y = this.frame.puyoLayer.toGlobal(this.root).y - 60 * 2;
     this.app.ticker.add((delta: number) => this.activePair?.update(delta));
-    this.app.stage.addChild(this.activePair);
+    this.root.addChild(this.activePair);
 
     //// TOOLBOX ////
     this.toolbox = new Toolbox(this);
     this.toolbox.position.set(438, 548);
-    this.app.stage.addChild(this.toolbox);
+    this.root.addChild(this.toolbox);
 
     //// CHAIN COUNTER ////
     this.chainCounter = new ChainCounter(this, this.frame.puyoLayer);
     this.chainCounter.x = 432;
     this.chainCounter.y = 836;
-    this.app.stage.addChild(this.chainCounter);
+    this.root.addChild(this.chainCounter);
     this.app.ticker.add((delta: number) => this.chainCounter?.update(delta));
 
     //// NEXT WINDOW ////
@@ -153,26 +162,56 @@ class Chainsim {
     this.nextWindow.position.set(456, 160);
     // this.nextWindow.position.set(200, 200);
     this.app.ticker.add((delta: number) => this.nextWindow?.update(delta));
-    this.app.stage.addChild(this.nextWindow);
+    this.root.addChild(this.nextWindow);
 
     //// OPTIONS ////
     this.optionButtons = new OptionButtons(this);
-    this.optionButtons.position.set(540, 30);
+    this.optionButtons.position.set(485, 30);
     this.optionButtons.scale.set(0.8);
-    this.app.stage.addChild(this.optionButtons);
+    this.root.addChild(this.optionButtons);
 
     //// Slide Changer ////
     this.slideChanger = new SlideChanger(this);
     this.slideChanger.position.set(530, 135);
     this.slideChanger.scale.set(0.76);
     this.app.ticker.add(() => this.slideChanger?.update());
-    this.app.stage.addChild(this.slideChanger);
+    this.root.addChild(this.slideChanger);
 
     //// Note Window ////
-    this.noteWindow = new NoteWindow(this);
-    // this.noteWindow.position.set(315, 900);
-    this.noteWindow.position.set(0, 0);
-    this.app.stage.addChild(this.noteWindow);
+    // this.noteWindow = new NoteWindow(this);
+    // // this.noteWindow.position.set(315, 900);
+    // this.noteWindow.position.set(0, 0);
+    // this.app.ticker.add(() => this.noteWindow?.update());
+    // this.root.addChild(this.noteWindow);
+
+    this.optionsMenu = new OptionsMenu(this);
+    this.app.stage.addChild(this.optionsMenu);
+    this.app.ticker.add(() => this.optionsMenu?.update());
+
+    // Handle window resize.
+    const resize = () => {
+      const parent = this.app.view.parentElement;
+      if (!parent) return;
+
+      const height = parent.getBoundingClientRect().width * 1.5873015873;
+      const width = parent.getBoundingClientRect().width;
+      this.app.view.style.height = `${height}px`;
+      this.app.view.style.width = `${width}px`;
+
+      // !!! Check if we have the note window open
+      // But if the game is taller than the window, resize it again
+      // const gameHeight = parseFloat(this.app.view.style.height.replace(/[^\d.-]/g, ''));
+      // if (height > window.innerHeight) {
+      //   height = window.innerHeight;
+      //   width = window.innerHeight * 0.63;
+      //   this.app.view.style.height = `${height}px`;
+      //   this.app.view.style.width = `${width}px`;
+      // }
+
+      this.noteWindow?.resize(width, height);
+    };
+    resize();
+    globalThis.onresize = resize;
 
     this.animationState = this.idle;
   }
@@ -319,7 +358,7 @@ class Chainsim {
     if (this.animationState === this.animatePops || this.animationState === this.animateChainDrops) {
       this.state.solverStep = this.state.solverStep === 0 ? 0 : this.state.solverStep - 1;
       this.state.simSpeed = 1;
-      this.animationState = this.chainPaused;
+      this.animationState = this.state.solverStep === 0 ? this.idle : this.chainPaused;
       const puyoField = this.state.solver.states[this.state.solverStep].puyoField;
       this.frame?.puyoLayer.refreshSprites(puyoField);
       return;

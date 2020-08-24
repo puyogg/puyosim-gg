@@ -1,6 +1,4 @@
 import { SimContainer } from '../container';
-import * as PIXI from 'pixi.js';
-import { ASSET_PATH } from '../constants';
 import { Chainsim } from '..';
 import { SimTools } from './sim';
 import { EditingTools } from './edit';
@@ -8,18 +6,14 @@ import { Switch } from './switch';
 import { Frame } from '../frame';
 
 export class SimAndEdit extends SimContainer {
-  private toolTextures: PIXI.ITextureDictionary;
-
-  private simTools: SimTools;
-  private editingTools: EditingTools;
+  public simTools: SimTools;
+  public editingTools: EditingTools;
 
   private simToolsBtn: Switch;
   private editToolsBtn: Switch;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
-
-    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
     this.simToolsBtn = new Switch(this.toolTextures['btn_sim.png'], this.toolTextures['btn_sim_pressed.png']);
     this.simToolsBtn.down = true;

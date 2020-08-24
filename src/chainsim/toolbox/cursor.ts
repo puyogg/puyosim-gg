@@ -18,6 +18,10 @@ export class PageCursor extends Page {
     this.addChild(this.tool);
   }
 
+  public refreshSprite(): void {
+    this.tool.texture = this.toolTextures[`cursor.png`];
+  }
+
   public setCurrent(): void {
     this.editLayer.currentTool = this.currentTool;
   }

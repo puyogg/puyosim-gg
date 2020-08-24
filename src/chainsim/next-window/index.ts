@@ -1,9 +1,7 @@
-import * as PIXI from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
 import { Window } from './window';
 import { DrawerToggle } from './toggle';
-import { ASSET_PATH } from '../constants';
 import { Drawer } from './drawer';
 import { ColorSet } from './color-set';
 
@@ -13,19 +11,15 @@ export interface WinState {
 }
 
 export class NextWindow extends SimContainer {
-  private toolTextures: PIXI.ITextureDictionary;
-
   public winState: WinState;
 
   public window: Window;
   private toggle: DrawerToggle;
   public drawer: Drawer;
-  private colorSet: ColorSet;
+  public colorSet: ColorSet;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
-
-    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
 
     this.winState = {
       currentTool: 0,

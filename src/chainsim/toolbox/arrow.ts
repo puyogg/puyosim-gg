@@ -33,6 +33,22 @@ export class PageArrow extends Page {
     }
   }
 
+  /** Update the textures the tool buttons use */
+  public refreshSprites(): void {
+    for (let r = 0; r < angles.length; r++) {
+      for (let c = 0; c < angles[r].length; c++) {
+        const angle = angles[r][c];
+        const texture = this.toolTextures[`arrow.png`];
+        const tool = this.arrowTools[r][c];
+        tool.texture = texture;
+        tool.anchor.set(0.5);
+        tool.x = 48 + 71 * c;
+        tool.y = 120 + 71 * r;
+        tool.rotation = angle;
+      }
+    }
+  }
+
   public setCurrent(): void {
     this.editLayer.currentTool = this.currentTool;
   }

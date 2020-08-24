@@ -1,12 +1,8 @@
-import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
-import { ASSET_PATH } from '../constants';
 
 export class Number3Digit extends SimContainer {
-  private numTextures: PIXI.ITextureDictionary;
-
   private offset: number;
   private align: string;
 
@@ -16,7 +12,6 @@ export class Number3Digit extends SimContainer {
   constructor(chainsim: Chainsim, offset: number, align: 'left' | 'middle' | 'right') {
     super(chainsim);
 
-    this.numTextures = this.resources[`${ASSET_PATH}/scoreFont.json`].textures as PIXI.ITextureDictionary;
     this.offset = offset;
     this.align = align;
 

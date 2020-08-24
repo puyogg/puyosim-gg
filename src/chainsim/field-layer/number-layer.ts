@@ -28,8 +28,8 @@ class NumberLayer extends Layer {
         const { x, y } = this.cellPos.get(r, c);
 
         const container = new Container();
-        const first = new Sprite(this.numberTextures['score_1.png']);
-        const second = new Sprite(this.numberTextures['score_8.png']);
+        const first = new Sprite(this.numTextures['score_1.png']);
+        const second = new Sprite(this.numTextures['score_8.png']);
         first.anchor.set(0.5);
         second.anchor.set(0.5);
         first.scale.set(0.7);
@@ -65,15 +65,15 @@ class NumberLayer extends Layer {
           first.visible = true;
           second.visible = false;
           first.x = 0;
-          first.texture = this.numberTextures[`score_${value}.png`];
+          first.texture = this.numTextures[`score_${value}.png`];
         } else {
           first.visible = true;
           second.visible = true;
           first.x = this.firstOffset;
           second.x = this.secondOffset;
           const numString = value.toString();
-          first.texture = this.numberTextures[`score_${numString[0]}.png`];
-          second.texture = this.numberTextures[`score_${numString[1]}.png`];
+          first.texture = this.numTextures[`score_${numString[0]}.png`];
+          second.texture = this.numTextures[`score_${numString[1]}.png`];
         }
       }
     }

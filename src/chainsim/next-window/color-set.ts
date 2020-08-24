@@ -1,16 +1,10 @@
-import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
-import { ASSET_PATH } from '../constants';
 import { WinState } from '.';
 import { PUYOTYPE, PUYONAME } from '../../solver/constants';
 
 export class ColorSet extends SimContainer {
-  private puyoTextures: PIXI.ITextureDictionary;
-  private toolTextures: PIXI.ITextureDictionary;
-  private layoutTextures: PIXI.ITextureDictionary;
-
   private winState: WinState;
   private availableColors: PUYOTYPE[];
   private colorSet: Sprite[];
@@ -21,10 +15,6 @@ export class ColorSet extends SimContainer {
     // Set reference to window editor state
     this.winState = winState;
 
-    this.puyoTextures = this.resources[`${ASSET_PATH}/puyo.json`].textures as PIXI.ITextureDictionary;
-    this.toolTextures = this.resources[`${ASSET_PATH}/tools.json`].textures as PIXI.ITextureDictionary;
-    this.layoutTextures = this.resources[`${ASSET_PATH}/layout.json`].textures as PIXI.ITextureDictionary;
-
     this.availableColors = [];
     this.checkAvailableColors(); // update this.availableColors
     this.colorSet = [];
@@ -32,6 +22,19 @@ export class ColorSet extends SimContainer {
       const color = this.availableColors[i];
       this.colorSet[i] = new Sprite(this.puyoTextures[`${PUYONAME[color]}_0.png`]);
       const sprite = this.colorSet[i];
+      sprite.scale.set(0.3);
+      sprite.anchor.set(0.5);
+      sprite.y = sprite.height * i;
+      this.addChild(sprite);
+    }
+  }
+
+  public refreshSprites(): void {
+    this.checkAvailableColors(); // update this.availableColors
+    for (let i = 0; i < this.availableColors.length; i++) {
+      const color = this.availableColors[i];
+      const sprite = this.colorSet[i];
+      sprite.texture = this.puyoTextures[`${PUYONAME[color]}_0.png`];
       sprite.scale.set(0.3);
       sprite.anchor.set(0.5);
       sprite.y = sprite.height * i;

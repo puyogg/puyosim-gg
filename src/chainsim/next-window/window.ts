@@ -2,13 +2,10 @@ import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
-import { ASSET_PATH } from '../constants';
 import { Next } from './next';
 import { WinState } from '.';
 
 export class Window extends SimContainer {
-  private layoutTextures: PIXI.ITextureDictionary;
-
   private border: Sprite;
   private background: Sprite;
   // private windowMask: PIXI.Graphics;
@@ -17,8 +14,6 @@ export class Window extends SimContainer {
 
   constructor(chainsim: Chainsim, winState: WinState) {
     super(chainsim);
-
-    this.layoutTextures = this.resources[`${ASSET_PATH}/layout.json`].textures as PIXI.ITextureDictionary;
 
     const container = new PIXI.Container();
     this.addChild(container);

@@ -1,7 +1,6 @@
 import { SimContainer } from './container';
 import * as PIXI from 'pixi.js';
 import { Sprite } from 'pixi.js';
-import { ASSET_PATH } from './constants';
 import { Chainsim } from '.';
 import { PuyoLayer } from './field-layer';
 
@@ -10,7 +9,6 @@ class ChainCounter extends SimContainer {
   private puyoLayer: PuyoLayer;
   private container: PIXI.Container;
 
-  private textures: PIXI.ITextureDictionary;
   private firstDigit: Sprite;
   private secondDigit: Sprite;
   private chainText: Sprite;
@@ -31,18 +29,16 @@ class ChainCounter extends SimContainer {
     this.prevState = this.chainsim.idle;
     this.solverPos = 0;
 
-    this.textures = this.resources[`${ASSET_PATH}/chain_font.json`].textures as PIXI.ITextureDictionary;
-
     // Everything moves together, but I don't want to mess up any global positioning
     // Make a nested container
     this.container = new PIXI.Container();
     this.addChild(this.container);
 
     // Numbers
-    this.firstDigit = new Sprite(this.textures['chain_1.png']);
+    this.firstDigit = new Sprite(this.chainFontTextures['chain_1.png']);
     this.firstDigit.scale.set(0.85);
     this.container.addChild(this.firstDigit);
-    this.secondDigit = new Sprite(this.textures['chain_8.png']);
+    this.secondDigit = new Sprite(this.chainFontTextures['chain_8.png']);
     this.secondDigit.scale.set(0.85);
     this.secondDigit.x = 40;
     this.container.addChild(this.secondDigit);
@@ -50,7 +46,7 @@ class ChainCounter extends SimContainer {
     this.secondDigit.visible = false;
 
     // Chain!
-    this.chainText = new Sprite(this.textures['chain_text.png']);
+    this.chainText = new Sprite(this.chainFontTextures['chain_text.png']);
     this.chainText.x = 84;
     this.chainText.y = 8;
     this.chainText.scale.set(0.85);
@@ -77,7 +73,10 @@ class ChainCounter extends SimContainer {
       this.solverPos = this.simState.solverStep;
       this.chain = this.simState.solver.states[this.simState.solverStep].chainLength;
       this.prepAnimation();
-    } else if (this.simState.solver.states[this.simState.solverStep].chainLength === 0) {
+    } else if (
+      this.simState.solver.states[this.simState.solverStep].chainLength === 0 ||
+      this.chainsim.animationState === this.chainsim.idle
+    ) {
       this.firstDigit.visible = false;
       this.secondDigit.visible = false;
       this.chainText.visible = false;
@@ -103,14 +102,14 @@ class ChainCounter extends SimContainer {
       this.firstDigit.visible = false;
       this.secondDigit.visible = true;
       this.chainText.visible = true;
-      this.secondDigit.texture = this.textures[`chain_${this.chain}.png`];
+      this.secondDigit.texture = this.chainFontTextures[`chain_${this.chain}.png`];
     } else {
       const chainString = this.chain.toString();
       this.firstDigit.visible = true;
       this.secondDigit.visible = true;
       this.chainText.visible = true;
-      this.firstDigit.texture = this.textures[`chain_${chainString[0]}.png`];
-      this.secondDigit.texture = this.textures[`chain_${chainString[1]}.png`];
+      this.firstDigit.texture = this.chainFontTextures[`chain_${chainString[0]}.png`];
+      this.secondDigit.texture = this.chainFontTextures[`chain_${chainString[1]}.png`];
     }
 
     this.velocity = 10;
