@@ -1,0 +1,118 @@
+{
+  "frames": {
+    "puyo_aqua_trim.png": {
+      "frame": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_beta_trim.png": {
+      "frame": { "x": 0, "y": 64, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_block_trim.png": {
+      "frame": { "x": 0, "y": 128, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_capsule_trim.png": {
+      "frame": { "x": 0, "y": 192, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_classic_trim.png": {
+      "frame": { "x": 0, "y": 256, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_degi_trim.png": {
+      "frame": { "x": 0, "y": 320, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_fever_trim.png": {
+      "frame": { "x": 0, "y": 384, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_gamegear_trim.png": {
+      "frame": { "x": 0, "y": 448, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_gummy_trim.png": {
+      "frame": { "x": 0, "y": 512, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_human_trim.png": {
+      "frame": { "x": 0, "y": 576, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_moji_trim.png": {
+      "frame": { "x": 0, "y": 640, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_moro_trim.png": {
+      "frame": { "x": 0, "y": 704, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_msx_trim.png": {
+      "frame": { "x": 0, "y": 768, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_shiki_trim.png": {
+      "frame": { "x": 0, "y": 832, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    },
+    "puyo_sonic_trim.png": {
+      "frame": { "x": 0, "y": 896, "w": 432, "h": 60 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+      "sourceSize": { "w": 432, "h": 60 }
+    }
+  },
+  "meta": {
+    "app": "https://www.codeandweb.com/texturepacker",
+    "version": "1.0",
+    "image": "puyotrim.png",
+    "format": "RGBA8888",
+    "size": { "w": 432, "h": 960 },
+    "scale": "1",
+    "smartupdate": "$TexturePacker:SmartUpdate:47fb1f2841d8116802f9e79cbd65aa76:626ecf085fa58a98cd176a92d58efba5:45c649fea7dbfd343675c846198e0cdb$"
+  }
+}

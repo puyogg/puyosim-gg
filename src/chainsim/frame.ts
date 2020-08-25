@@ -15,11 +15,18 @@ class Frame extends SimContainer {
   public numberLayer: NumberLayer;
   public editLayer: EditLayer;
   public layers: Layer[];
+  public charBG: Sprite;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
-    this.initCharBG();
+    this.resources[this.simState.aesthetic.charBG].texture;
+
+    this.charBG = new Sprite(this.resources[this.simState.aesthetic.charBG].texture);
+    this.charBG.x = 17;
+    this.charBG.y = 51;
+    this.addChild(this.charBG);
+
     this.initBorders();
 
     this.layerContainer = new PIXI.Container();
@@ -65,15 +72,6 @@ class Frame extends SimContainer {
     this.arrowLayer.update(delta);
     this.cursorLayer.update(delta);
     this.numberLayer.update(delta);
-  }
-
-  private initCharBG(): void {
-    const texture = this.resources[`${ASSET_PATH}/arle_bg.png`].texture;
-
-    const charBG = new Sprite(texture);
-    charBG.x = 17;
-    charBG.y = 51;
-    this.addChild(charBG);
   }
 
   private initBorders(): void {

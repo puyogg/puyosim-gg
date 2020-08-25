@@ -2,6 +2,8 @@ import { PuyoField, NumField, BoolField } from '../solver/field';
 import { PUYOTYPE, DEFAULT_SETTINGS } from '../solver/constants';
 import { ChainSolver } from '../solver';
 import { TsuRNG } from './rng';
+import { ASSET_PATH } from './constants';
+import { parseCharID, parseSkinID, makeHSBFilter } from './helper/aesthetic';
 
 interface SimulatorSettings {
   rows: number;
@@ -27,6 +29,41 @@ interface FieldData {
 interface PuyoMovement {
   softDropSpeed: number; // Used for soft dropping and for gravity after chaining event.
   dropSpeedDuringChain: number; // Drop speed used on Puyos after a chaining event
+}
+
+interface Aesthetic {
+  charBG: string;
+  charID: number;
+  skin: string;
+  skinID: number;
+  hsbData: HSBData;
+  hsbFilters: HSBFilters;
+}
+
+interface PuyoHSB {
+  hue: number;
+  sat: number;
+  bri: number;
+}
+
+export interface HSBData {
+  [index: string]: PuyoHSB;
+  red: PuyoHSB;
+  green: PuyoHSB;
+  blue: PuyoHSB;
+  yellow: PuyoHSB;
+  purple: PuyoHSB;
+  garbage: PuyoHSB;
+}
+
+export interface HSBFilters {
+  [index: string]: PIXI.Filter;
+  red: PIXI.Filter;
+  green: PIXI.Filter;
+  blue: PIXI.Filter;
+  yellow: PIXI.Filter;
+  purple: PIXI.Filter;
+  garbage: PIXI.Filter;
 }
 
 type LoadableSlideData = PUYOTYPE[] | PuyoField | FieldData | FieldData[] | undefined;
@@ -67,6 +104,9 @@ class AppState {
   // Puyo movement
   public puyoMovement: PuyoMovement;
 
+  // customization
+  public aesthetic: Aesthetic;
+
   constructor(x?: LoadableSlideData) {
     this.mode = 'editor'; // Need to include option to load straight into game mode.
     this.replay = false; // If true, don't override the next slides when the sim steps.
@@ -78,6 +118,33 @@ class AppState {
     this.origPool = this.pool.slice();
     this.poolPos = 0;
     this.poolChanged = false;
+
+    console.log(`${ASSET_PATH}/character/${parseCharID(7)}`);
+
+    this.aesthetic = {
+      charID: 30,
+      charBG: `${ASSET_PATH}/character/${parseCharID(30)}`,
+      skinID: 2,
+      skin: `${ASSET_PATH}/puyo/${parseSkinID(2)}`,
+      hsbData: {
+        red: { hue: 0, sat: 0, bri: 1 },
+        green: { hue: 0, sat: 0, bri: 1 },
+        blue: { hue: 0, sat: 0, bri: 1 },
+        yellow: { hue: 0, sat: 0, bri: 1 },
+        purple: { hue: 0, sat: 0, bri: 1 },
+        garbage: { hue: 0, sat: 0, bri: 1 },
+      },
+      hsbFilters: {
+        red: makeHSBFilter(0, 0, 1),
+        green: makeHSBFilter(0, 0, 1),
+        blue: makeHSBFilter(0, 0, 1),
+        yellow: makeHSBFilter(0, 0, 1),
+        purple: makeHSBFilter(0, 0, 1),
+        garbage: makeHSBFilter(0, 0, 1),
+      },
+    };
+
+    console.log(this.aesthetic.hsbFilters);
 
     this.simSettings = {
       rows: 13,

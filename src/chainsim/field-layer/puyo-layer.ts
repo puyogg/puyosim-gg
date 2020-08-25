@@ -107,6 +107,11 @@ class PuyoLayer extends Layer {
         sprite.alpha = 1;
         sprite.visible = true;
 
+        // Set the filter
+        if (isColored(puyo) || puyo === PUYOTYPE.GARBAGE) {
+          sprite.filters = [this.simState.aesthetic.hsbFilters[name]];
+        }
+
         // If the cell isn't a Puyo, or is empty, just have to set its type + _0.png
         if (!isColored(puyo)) {
           sprite.texture = this.puyoTextures[`${name}_0.png`];

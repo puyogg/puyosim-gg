@@ -198,6 +198,7 @@ export class SkinPage extends OptionPage {
         this.chainsim.garbageTray?.refreshSprites();
         this.chainsim.toolbox?.simAndEdit.editingTools.pageMain.refreshSprites();
         this.chainsim.toolbox?.simAndEdit.editingTools.pageShadow.refreshSprites();
+        this.chainsim.optionsMenu?.colorsPage.refreshSprites();
 
         this.optionsMenu.isLoading = false;
       });

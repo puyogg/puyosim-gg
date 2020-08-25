@@ -14,6 +14,7 @@ import { SlideChanger } from './slide';
 import { get2d } from '../solver/helper';
 import { NoteWindow } from './note';
 import { OptionsMenu } from './options';
+import puyoJSON from './helper/puyo.json';
 
 /** Subset of options available at https://pixijs.download/v5.3.3/docs/PIXI.Application.html */
 interface PixiOptions {
@@ -83,12 +84,20 @@ class Chainsim {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     this.animationState = () => {};
 
+    // Replace the loaded puyo skin with the one in the state obj.
+    puyoJSON.meta.image = this.state.aesthetic.skin;
+    const sheetBase64 = globalThis.btoa(JSON.stringify(puyoJSON));
+    const sheetURL = 'data:application/json;base64,' + sheetBase64;
+
     // Run the asset loader
     this.loader
-      .add(`${ASSET_PATH}/arle_bg.png`)
+      .add(this.state.aesthetic.charBG)
       .add(`${ASSET_PATH}/save_wheel.png`)
+      .add(`${ASSET_PATH}/char_ppt.json`)
+      .add(`${ASSET_PATH}/char_esports.json`)
+      .add(`${ASSET_PATH}/selected_char.png`)
       .add(`${ASSET_PATH}/bubble.png`)
-      .add(`${ASSET_PATH}/puyo.json`)
+      .add(`${ASSET_PATH}/puyo.json`, sheetURL)
       .add(`${ASSET_PATH}/layout.json`)
       .add(`${ASSET_PATH}/scoreFont.json`)
       .add(`${ASSET_PATH}/chain_font.json`)

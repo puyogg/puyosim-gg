@@ -7,6 +7,7 @@ import { Switch } from '../toolbox/switch';
 import { SkinPage } from './skins';
 import { OptionPage } from './page';
 import { ColorsPage } from './colors';
+import { CharacterPage } from './character';
 
 const blurFilter = new PIXI.filters.BlurFilter();
 
@@ -27,6 +28,7 @@ export class OptionsMenu extends SimContainer {
 
   public skinPage: SkinPage;
   public colorsPage: ColorsPage;
+  public characterPage: CharacterPage;
   public loadDimmer: Container;
   private saveWheel: Sprite;
   public isLoading: boolean;
@@ -93,15 +95,17 @@ export class OptionsMenu extends SimContainer {
     }
 
     // Set up pages to display
-    this.pageNum = 0;
+    this.pageNum = 1;
 
     // Pages
     this.skinPage = new SkinPage(chainsim, this);
     this.skinPage.position.set(55, 180);
     this.colorsPage = new ColorsPage(chainsim, this);
     this.colorsPage.position.set(55, 180);
+    this.characterPage = new CharacterPage(chainsim, this);
+    this.characterPage.position.set(55, 180);
 
-    this.pages = [this.skinPage, this.colorsPage];
+    this.pages = [this.skinPage, this.colorsPage, this.characterPage];
     this.addChild(...this.pages);
 
     // Exit button

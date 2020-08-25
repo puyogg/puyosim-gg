@@ -1,0 +1,122 @@
+[
+  {
+    "frame": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_aqua.png"
+  },
+  {
+    "frame": { "x": 0, "y": 64, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_beta.png"
+  },
+  {
+    "frame": { "x": 0, "y": 128, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_block.png"
+  },
+  {
+    "frame": { "x": 0, "y": 192, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_capsule.png"
+  },
+  {
+    "frame": { "x": 0, "y": 256, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_classic.png"
+  },
+  {
+    "frame": { "x": 0, "y": 320, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_degi.png"
+  },
+  {
+    "frame": { "x": 0, "y": 384, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_fever.png"
+  },
+  {
+    "frame": { "x": 0, "y": 448, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_gamegear.png"
+  },
+  {
+    "frame": { "x": 0, "y": 512, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_gummy.png"
+  },
+  {
+    "frame": { "x": 0, "y": 576, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_human.png"
+  },
+  {
+    "frame": { "x": 0, "y": 640, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_moji.png"
+  },
+  {
+    "frame": { "x": 0, "y": 704, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_moro.png"
+  },
+  {
+    "frame": { "x": 0, "y": 768, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_msx.png"
+  },
+  {
+    "frame": { "x": 0, "y": 832, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_shiki.png"
+  },
+  {
+    "frame": { "x": 0, "y": 896, "w": 432, "h": 60 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 432, "h": 60 },
+    "sourceSize": { "w": 432, "h": 60 },
+    "textureName": "puyo_sonic.png"
+  }
+]

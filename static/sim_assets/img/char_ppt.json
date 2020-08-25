@@ -1,0 +1,228 @@
+{
+  "frames": {
+    "ppt_icon_rng": {
+      "field": "field_ppt_rng.png",
+      "frame": { "x": 12, "y": 12, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_ris": {
+      "field": "field_ppt_ris.png",
+      "frame": { "x": 200, "y": 12, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_shz": {
+      "field": "field_ppt_shz.png",
+      "frame": { "x": 388, "y": 12, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_o": {
+      "field": "field_ppt_t_o.png",
+      "frame": { "x": 576, "y": 12, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_t": {
+      "field": "field_ppt_t_t.png",
+      "frame": { "x": 12, "y": 160, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_mag": {
+      "field": "field_ppt_mag.png",
+      "frame": { "x": 200, "y": 160, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_ami": {
+      "field": "field_ppt_ami.png",
+      "frame": { "x": 388, "y": 160, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_fel": {
+      "field": "field_ppt_t_fel.png",
+      "frame": { "x": 576, "y": 160, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_ti_i": {
+      "field": "field_ppt_ti_i.png",
+      "frame": { "x": 12, "y": 308, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_s": {
+      "field": "field_ppt_t_s.png",
+      "frame": { "x": 200, "y": 308, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_klu": {
+      "field": "field_ppt_klu.png",
+      "frame": { "x": 388, "y": 308, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_sig": {
+      "field": "field_ppt_sig.png",
+      "frame": { "x": 576, "y": 308, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_dra": {
+      "field": "field_ppt_dra.png",
+      "frame": { "x": 12, "y": 456, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_z": {
+      "field": "field_ppt_t_z.png",
+      "frame": { "x": 200, "y": 456, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_jl": {
+      "field": "field_ppt_t_jl.png",
+      "frame": { "x": 388, "y": 456, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_arl": {
+      "field": "field_ppt_arl.png",
+      "frame": { "x": 576, "y": 456, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_suk": {
+      "field": "field_ppt_suk.png",
+      "frame": { "x": 12, "y": 604, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_sat": {
+      "field": "field_ppt_t_sat.png",
+      "frame": { "x": 200, "y": 604, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_rul": {
+      "field": "field_ppt_t_rul.png",
+      "frame": { "x": 388, "y": 604, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_raf": {
+      "field": "field_ppt_t_raf.png",
+      "frame": { "x": 576, "y": 604, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_wch": {
+      "field": "field_ppt_wch.png",
+      "frame": { "x": 12, "y": 752, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_eco": {
+      "field": "field_ppt_t_eco.png",
+      "frame": { "x": 200, "y": 752, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_t_mst": {
+      "field": "field_ppt_t_mst.png",
+      "frame": { "x": 388, "y": 752, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    "ppt_icon_lem": {
+      "field": "field_ppt_lem.png",
+      "frame": { "x": 576, "y": 752, "w": 168, "h": 128 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 168, "h": 128 },
+      "sourceSize": { "w": 168, "h": 128 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    }
+  },
+  "meta": {
+    "app": "http://www.puyonexus.com",
+    "version": "1.0",
+    "image": "/sim_assets/img/char_ppt.png",
+    "format": "RGBA8888",
+    "size": { "w": 1024, "h": 1066 },
+    "scale": "1"
+  }
+}
