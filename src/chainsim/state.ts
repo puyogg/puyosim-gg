@@ -4,20 +4,21 @@ import { ChainSolver } from '../solver';
 import { TsuRNG } from './rng';
 import { ASSET_PATH } from './constants';
 import { parseCharID, parseSkinID, makeHSBFilter } from './helper/aesthetic';
+import localforage from 'localforage';
 
-interface SimulatorSettings {
+export interface SimulatorSettings {
   rows: number;
   cols: number;
   hrows: number;
   puyoToPop: number;
 }
 
-interface PixelSizing {
+export interface PixelSizing {
   cellWidth: number;
   cellHeight: number;
 }
 
-interface FieldData {
+export interface FieldData {
   puyo: PuyoField;
   shadow: PuyoField;
   arrow: NumField;
@@ -26,12 +27,12 @@ interface FieldData {
   comment?: string;
 }
 
-interface PuyoMovement {
+export interface PuyoMovement {
   softDropSpeed: number; // Used for soft dropping and for gravity after chaining event.
   dropSpeedDuringChain: number; // Drop speed used on Puyos after a chaining event
 }
 
-interface Aesthetic {
+export interface Aesthetic {
   charBG: string;
   charID: number;
   skin: string;
@@ -40,7 +41,7 @@ interface Aesthetic {
   hsbFilters: HSBFilters;
 }
 
-interface PuyoHSB {
+export interface PuyoHSB {
   hue: number;
   sat: number;
   bri: number;
@@ -66,14 +67,23 @@ export interface HSBFilters {
   garbage: PIXI.Filter;
 }
 
-type LoadableSlideData = PUYOTYPE[] | PuyoField | FieldData | FieldData[] | undefined;
+/** Subset of the overall app state that can go into local storage. */
+interface SavedState {
+  // Puyo Randomization
+  seed?: number;
+  pool: number[];
+
+  simSettings: SimulatorSettings;
+}
+
+export type LoadableSlideData = PUYOTYPE[] | PuyoField | FieldData | FieldData[] | undefined;
 
 // Type Guards
-function isPuyoArray(array: PUYOTYPE[] | FieldData[]): array is PUYOTYPE[] {
+export function isPuyoArray(array: PUYOTYPE[] | FieldData[]): array is PUYOTYPE[] {
   return typeof array[0] === 'number';
 }
 
-class AppState {
+export class AppState {
   // Puyo Randomization
   public seed: number; // 32-bit unsigned integer
   public pool: number[];
@@ -143,8 +153,6 @@ class AppState {
         garbage: makeHSBFilter(0, 0, 1),
       },
     };
-
-    console.log(this.aesthetic.hsbFilters);
 
     this.simSettings = {
       rows: 13,
@@ -260,6 +268,17 @@ class AppState {
   public get latestFields(): FieldData {
     return this.slides[this.slides.length - 1];
   }
-}
 
-export { AppState, LoadableSlideData };
+  public async loadLocalSettings(): Promise<void> {
+    try {
+      const value = await localforage.getItem('puyosim-gg');
+      console.log(value);
+    } catch (err) {
+      console.log('Error', err);
+    }
+  }
+
+  public async saveLocalSettings(): Promise<void> {
+    //
+  }
+}

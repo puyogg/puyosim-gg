@@ -16,17 +16,14 @@ export class ColorSet extends SimContainer {
     this.winState = winState;
 
     this.availableColors = [];
-    this.checkAvailableColors(); // update this.availableColors
     this.colorSet = [];
+    this.checkAvailableColors(); // update this.availableColors
     for (let i = 0; i < this.availableColors.length; i++) {
-      const color = this.availableColors[i];
-      this.colorSet[i] = new Sprite(this.puyoTextures[`${PUYONAME[color]}_0.png`]);
-      const sprite = this.colorSet[i];
-      sprite.scale.set(0.3);
-      sprite.anchor.set(0.5);
-      sprite.y = sprite.height * i;
-      this.addChild(sprite);
+      this.colorSet[i] = new Sprite(this.puyoTextures['spacer_0.png']);
+      this.addChild(this.colorSet[i]);
     }
+
+    this.refreshSprites();
   }
 
   public refreshSprites(): void {
@@ -38,7 +35,8 @@ export class ColorSet extends SimContainer {
       sprite.scale.set(0.3);
       sprite.anchor.set(0.5);
       sprite.y = sprite.height * i;
-      this.addChild(sprite);
+
+      sprite.filters = [this.simState.aesthetic.hsbFilters[PUYONAME[color]]];
     }
   }
 

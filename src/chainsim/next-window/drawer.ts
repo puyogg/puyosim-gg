@@ -6,6 +6,7 @@ import { WinState } from '.';
 import { NextNumber } from './next-number';
 import { PUYONAME, PUYOTYPE } from '../../solver/constants';
 import { NextTool } from './tool';
+import { isColored } from '../../solver/helper';
 
 export class Drawer extends SimContainer {
   private winState: WinState;
@@ -104,11 +105,20 @@ export class Drawer extends SimContainer {
       const poolIdx = this.simState.poolPos + i + 4;
       const puyo = this.simState.pool[poolIdx] as PUYOTYPE;
       this.puyos[i].texture = this.puyoTextures[`${PUYONAME[puyo]}_0.png`];
+
+      // Set HSB filters. Have to check if it's a colored or garbage (garbage) puyo.
+      if (isColored(puyo) || puyo === PUYOTYPE.GARBAGE) {
+        this.puyos[i].filters = [this.simState.aesthetic.hsbFilters[PUYONAME[puyo]]];
+      }
     }
 
     for (let i = 0; i < 7; i++) {
       const type = i as PUYOTYPE;
       this.tools[i].texture = this.puyoTextures[`${PUYONAME[type]}_0.png`];
+
+      if (isColored(type) || type === PUYOTYPE.GARBAGE) {
+        this.tools[i].filters = [this.simState.aesthetic.hsbFilters[PUYONAME[type]]];
+      }
     }
     this.tools[0].texture = this.toolTextures['editor_x.png'];
     this.tools[7].texture = this.toolTextures['return.png'];

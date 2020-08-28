@@ -2,6 +2,7 @@ import { Page } from './page';
 import { Chainsim } from '..';
 import { PUYOTYPE } from '../../solver/constants';
 import { ToolSprite } from './tool';
+import { isColored } from '../../solver/helper';
 
 const names: string[][] = [
   ['red', 'green', 'blue'],
@@ -34,6 +35,11 @@ export class PageMain extends Page {
         tool.anchor.set(0.5);
         tool.x = 48 + 71 * c;
         tool.y = 120 + 71 * r;
+
+        if (isColored(value) || value === PUYOTYPE.GARBAGE) {
+          tool.filters = [this.simState.aesthetic.hsbFilters[name]];
+        }
+
         this.puyoTools[r][c] = tool;
         this.tools.push(tool);
         this.addChild(tool);

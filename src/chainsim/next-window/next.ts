@@ -4,6 +4,7 @@ import { Chainsim } from '..';
 import { Coord } from '../position';
 import { PUYOTYPE, PUYONAME } from '../../solver/constants';
 import { WinState } from '.';
+import { isColored } from '../../solver/helper';
 
 export class Next extends SimContainer {
   private sprites: Sprite[];
@@ -79,12 +80,17 @@ export class Next extends SimContainer {
     const poolPos = this.simState.poolPos;
 
     for (let i = 0; i < 6; i++) {
-      const name = PUYONAME[pool[(poolPos + i) % pool.length] as PUYOTYPE];
+      const puyo = pool[(poolPos + i) % pool.length] as PUYOTYPE;
+      const name = PUYONAME[puyo];
       const sprite = this.sprites[i];
       sprite.texture = this.puyoTextures[`${name}_0.png`];
       const { x, y } = this.coords[i];
       sprite.position.set(x, y);
       sprite.scale.set(i < 2 ? 1 : this.scaling);
+
+      if (isColored(puyo) || puyo === PUYOTYPE.GARBAGE) {
+        sprite.filters = [this.simState.aesthetic.hsbFilters[name]];
+      }
     }
   }
 

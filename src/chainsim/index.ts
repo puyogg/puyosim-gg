@@ -84,6 +84,13 @@ class Chainsim {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     this.animationState = () => {};
 
+    this.runLoader();
+  }
+
+  private async runLoader(): Promise<void> {
+    // Overwrite the sim state with any saved data from IndexedDB.
+    await this.state.loadLocalSettings();
+
     // Replace the loaded puyo skin with the one in the state obj.
     puyoJSON.meta.image = this.state.aesthetic.skin;
     const sheetBase64 = globalThis.btoa(JSON.stringify(puyoJSON));
@@ -106,15 +113,13 @@ class Chainsim {
       .load()
       .onComplete.once(() => {
         this.simLoaded = true;
-        this.init();
+        this.initObjects();
         this.app.ticker.add((delta: number) => this.gameLoop(delta));
       });
-
-    // Add components that this instance of Chainsim will need
   }
 
   /** Initialize sprites and containers that are shared among all chainsim types. */
-  private init(): void {
+  private initObjects(): void {
     // Test background
     const graphics = new PIXI.Graphics();
     graphics.beginFill(0x22dd77);
