@@ -3,7 +3,7 @@ import { Chainsim } from '..';
 import { Button } from './button';
 
 class SimTools extends SimContainer {
-  private btnShare: Button;
+  private btnNote: Button;
   private btnReset: Button;
   private btnBack: Button;
   private btnPause: Button;
@@ -13,13 +13,17 @@ class SimTools extends SimContainer {
   constructor(chainsim: Chainsim) {
     super(chainsim);
 
-    this.btnShare = new Button(this.toolTextures['btn_share.png'], this.toolTextures['btn_share_pressed.png']);
-    this.btnShare.anchor.set(0.5);
-    this.btnShare.position.set(0, 0);
-    this.btnShare.on('pointerdown', () => {
-      console.log(this.simState.slides[this.simState.slidePos]);
+    this.btnNote = new Button(this.toolTextures['btn_note.png'], this.toolTextures['btn_note_pressed.png']);
+    this.btnNote.anchor.set(0.5);
+    this.btnNote.position.set(0, 0);
+    this.btnNote.on('pointerdown', () => {
+      // console.log(this.simState.slides[this.simState.slidePos]);
+      const noteWindow = this.chainsim.noteWindow;
+      if (noteWindow) {
+        noteWindow.visible = true;
+      }
     });
-    this.addChild(this.btnShare);
+    this.addChild(this.btnNote);
 
     this.btnReset = new Button(this.toolTextures['btn_reset.png'], this.toolTextures['btn_reset_pressed.png']);
     this.btnReset.anchor.set(0.5);

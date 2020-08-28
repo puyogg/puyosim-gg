@@ -9,11 +9,12 @@ import { Toolbox } from './toolbox';
 import { NextWindow } from './next-window';
 import { OptionButtons } from './meta-options';
 import { ActivePairContainer } from './active-pair';
-import { PuyoField, NumField, BoolField } from '../solver/field';
+import { PuyoField } from '../solver/field';
 import { SlideChanger } from './slide';
 import { get2d } from '../solver/helper';
 import { NoteWindow } from './note';
 import { OptionsMenu } from './options';
+import { Keyboard } from './keyboard';
 import puyoJSON from './helper/puyo.json';
 
 /** Subset of options available at https://pixijs.download/v5.3.3/docs/PIXI.Application.html */
@@ -61,6 +62,9 @@ class Chainsim {
 
   public optionsMenu: OptionsMenu | undefined;
 
+  // Controls
+  public keyboard: Keyboard;
+
   // Function that plays on every tick. Swap it out with other methods.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public animationState: (delta: number, ...args: any[]) => void;
@@ -68,11 +72,13 @@ class Chainsim {
   constructor(options: PixiOptions, slideData?: LoadableSlideData) {
     this.simLoaded = false;
     this.app = new PIXI.Application(options);
+
     this.root = new PIXI.Container();
     this.app.stage.addChild(this.root);
 
     // Construct the starting state. Some stuff might've been passed
     // in as a parameter...
+    this.keyboard = new Keyboard(this.app.view);
     this.state = new AppState(slideData);
 
     // Set up loader, but don't run it yet. I need the reference to resources.
@@ -83,6 +89,41 @@ class Chainsim {
     // Set default animation state
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     this.animationState = () => {};
+
+    // CSS Stuff
+    // so  users don't get trapped inside the chainsim
+    this.app.renderer.plugins.interaction.autoPreventDefault = false;
+    this.app.renderer.view.style.touchAction = 'manipulation';
+    this.app.renderer.view.style.width = '100%';
+    // Set tabindex=0 to allow for focusable keyboard inputs
+    this.app.renderer.view.tabIndex = 0;
+
+    // Handle window resize.
+    const resize = () => {
+      const parent = this.app.view.parentElement;
+      if (!parent) return;
+
+      let height = parent.getBoundingClientRect().width * 1.5873015873;
+      let width = parent.getBoundingClientRect().width;
+      this.app.view.style.height = `${height}px`;
+      this.app.view.style.width = `${width}px`;
+
+      // !!! Check if we have the note window open
+      // But if the game is taller than the window, resize it again
+      // let gameHeight = parseFloat(this.app.view.style.height.replace(/[^\d.-]/g, ''));
+      if (!this.noteWindow?.visible) {
+        if (height > window.innerHeight) {
+          height = window.innerHeight;
+          width = window.innerHeight * 0.63;
+          this.app.view.style.height = `${height}px`;
+          this.app.view.style.width = `${width}px`;
+        }
+      }
+
+      this.noteWindow?.resize(width, height);
+    };
+    resize();
+    globalThis.onresize = resize;
 
     this.runLoader();
   }
@@ -126,11 +167,6 @@ class Chainsim {
     graphics.drawRect(0, 0, 630, 1000);
     graphics.endFill();
     this.root.addChild(graphics);
-
-    // so  users don't get trapped inside the chainsim
-    this.app.renderer.plugins.interaction.autoPreventDefault = false;
-    this.app.renderer.view.style.touchAction = 'manipulation';
-    this.app.renderer.view.style.width = '100%';
 
     //// FIELD ////
     this.frame = new Frame(this);
@@ -191,9 +227,8 @@ class Chainsim {
     this.app.ticker.add(() => this.slideChanger?.update());
     this.root.addChild(this.slideChanger);
 
-    //// Note Window ////
+    // // Note Window ////
     // this.noteWindow = new NoteWindow(this);
-    // // this.noteWindow.position.set(315, 900);
     // this.noteWindow.position.set(0, 0);
     // this.app.ticker.add(() => this.noteWindow?.update());
     // this.root.addChild(this.noteWindow);
@@ -201,31 +236,6 @@ class Chainsim {
     this.optionsMenu = new OptionsMenu(this);
     this.app.stage.addChild(this.optionsMenu);
     this.app.ticker.add(() => this.optionsMenu?.update());
-
-    // Handle window resize.
-    const resize = () => {
-      const parent = this.app.view.parentElement;
-      if (!parent) return;
-
-      const height = parent.getBoundingClientRect().width * 1.5873015873;
-      const width = parent.getBoundingClientRect().width;
-      this.app.view.style.height = `${height}px`;
-      this.app.view.style.width = `${width}px`;
-
-      // !!! Check if we have the note window open
-      // But if the game is taller than the window, resize it again
-      // const gameHeight = parseFloat(this.app.view.style.height.replace(/[^\d.-]/g, ''));
-      // if (height > window.innerHeight) {
-      //   height = window.innerHeight;
-      //   width = window.innerHeight * 0.63;
-      //   this.app.view.style.height = `${height}px`;
-      //   this.app.view.style.width = `${width}px`;
-      // }
-
-      this.noteWindow?.resize(width, height);
-    };
-    resize();
-    globalThis.onresize = resize;
 
     this.animationState = this.idle;
   }
