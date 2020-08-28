@@ -8,6 +8,9 @@ import { SkinPage } from './skins';
 import { OptionPage } from './page';
 import { ColorsPage } from './colors';
 import { CharacterPage } from './character';
+import { ControlPage } from './control';
+import { SimulatorPage } from './simulator';
+import { ChainsPage } from './chains';
 
 const blurFilter = new PIXI.filters.BlurFilter();
 
@@ -29,6 +32,9 @@ export class OptionsMenu extends SimContainer {
   public skinPage: SkinPage;
   public colorsPage: ColorsPage;
   public characterPage: CharacterPage;
+  public controlPage: ControlPage;
+  public simulatorPage: SimulatorPage;
+  public chainsPage: ChainsPage;
   public loadDimmer: Container;
   private saveWheel: Sprite;
   public isLoading: boolean;
@@ -104,8 +110,18 @@ export class OptionsMenu extends SimContainer {
     this.colorsPage.position.set(55, 180);
     this.characterPage = new CharacterPage(chainsim, this);
     this.characterPage.position.set(55, 180);
+    this.controlPage = new ControlPage(chainsim, this);
+    this.simulatorPage = new SimulatorPage(chainsim, this);
+    this.chainsPage = new ChainsPage(chainsim, this);
 
-    this.pages = [this.skinPage, this.colorsPage, this.characterPage];
+    this.pages = [
+      this.skinPage,
+      this.colorsPage,
+      this.characterPage,
+      this.controlPage,
+      this.simulatorPage,
+      this.chainsPage,
+    ];
     this.addChild(...this.pages);
 
     // Exit button
