@@ -99,33 +99,58 @@ class Chainsim {
     this.app.renderer.view.tabIndex = 0;
 
     // Handle window resize.
-    const resize = () => {
-      const parent = this.app.view.parentElement;
-      if (!parent) return;
+    // const resize = () => {
+    //   const parent = this.app.view.parentElement;
+    //   if (!parent) return;
 
-      let height = parent.getBoundingClientRect().width * 1.5873015873;
-      let width = parent.getBoundingClientRect().width;
-      this.app.view.style.height = `${height}px`;
-      this.app.view.style.width = `${width}px`;
+    //   let height = parent.getBoundingClientRect().width * 1.5873015873;
+    //   let width = parent.getBoundingClientRect().width;
+    //   this.app.view.style.height = `${height}px`;
+    //   this.app.view.style.width = `${width}px`;
 
-      // !!! Check if we have the note window open
-      // But if the game is taller than the window, resize it again
-      // let gameHeight = parseFloat(this.app.view.style.height.replace(/[^\d.-]/g, ''));
-      if (!this.noteWindow?.visible) {
-        if (height > window.innerHeight) {
-          height = window.innerHeight;
-          width = window.innerHeight * 0.63;
-          this.app.view.style.height = `${height}px`;
-          this.app.view.style.width = `${width}px`;
-        }
-      }
+    //   // !!! Check if we have the note window open
+    //   // But if the game is taller than the window, resize it again
+    //   // let gameHeight = parseFloat(this.app.view.style.height.replace(/[^\d.-]/g, ''));
+    //   if (!this.noteWindow?.visible) {
+    //     if (height > window.innerHeight) {
+    //       height = window.innerHeight;
+    //       width = window.innerHeight * 0.63;
+    //       this.app.view.style.height = `${height}px`;
+    //       this.app.view.style.width = `${width}px`;
+    //     }
+    //   }
 
-      this.noteWindow?.resize(width, height);
-    };
-    resize();
-    globalThis.onresize = resize;
+    //   this.noteWindow?.resize(width, height);
+    // };
+    // resize();
+    globalThis.onresize = this.resizeCanvas;
+    this.resizeCanvas();
 
     this.runLoader();
+  }
+
+  private resizeCanvas(): void {
+    const parent = this.app.view.parentElement;
+    if (!parent) return;
+
+    let height = parent.getBoundingClientRect().width * 1.5873015873;
+    let width = parent.getBoundingClientRect().width;
+    this.app.view.style.height = `${height}px`;
+    this.app.view.style.width = `${width}px`;
+
+    // !!! Check if we have the note window open
+    // But if the game is taller than the window, resize it again
+    // let gameHeight = parseFloat(this.app.view.style.height.replace(/[^\d.-]/g, ''));
+    if (!this.noteWindow?.visible) {
+      if (height > window.innerHeight) {
+        height = window.innerHeight;
+        width = window.innerHeight * 0.63;
+        this.app.view.style.height = `${height}px`;
+        this.app.view.style.width = `${width}px`;
+      }
+    }
+
+    this.noteWindow?.resize(width, height);
   }
 
   private async runLoader(): Promise<void> {
@@ -237,6 +262,8 @@ class Chainsim {
     this.app.stage.addChild(this.optionsMenu);
     this.app.ticker.add(() => this.optionsMenu?.update());
 
+    // Now that everything's been placed, resize the canvas.
+    this.resizeCanvas();
     this.animationState = this.idle;
   }
 

@@ -101,7 +101,7 @@ export class OptionsMenu extends SimContainer {
     }
 
     // Set up pages to display
-    this.pageNum = 1;
+    this.pageNum = 4;
 
     // Pages
     this.skinPage = new SkinPage(chainsim, this);

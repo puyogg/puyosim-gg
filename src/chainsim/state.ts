@@ -90,6 +90,7 @@ export class AppState {
   public origPool: number[];
   public poolPos: number;
   public poolChanged: boolean; // If you manually edit any puyos
+  public colorOrder: number[];
 
   // Overall state
   public mode: 'editor' | 'game';
@@ -121,9 +122,10 @@ export class AppState {
     this.mode = 'editor'; // Need to include option to load straight into game mode.
     this.replay = false; // If true, don't override the next slides when the sim steps.
 
+    this.colorOrder = [2, 3, 4, 5, 6];
     this.seed = Math.floor(Math.random() * 4294967296); // 32-bit unsigned int
     console.log('Color seed: ', this.seed);
-    this.pool = TsuRNG.getPools(this.seed, [2, 3, 4, 5, 6]).color4;
+    this.pool = TsuRNG.getPools(this.seed, this.colorOrder).color4;
     console.log('Pool: ', this.pool);
     this.origPool = this.pool.slice();
     this.poolPos = 0;
@@ -279,6 +281,6 @@ export class AppState {
   }
 
   public async saveLocalSettings(): Promise<void> {
-    //
+    const settings = {};
   }
 }
