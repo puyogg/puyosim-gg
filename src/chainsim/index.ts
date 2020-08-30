@@ -79,7 +79,7 @@ class Chainsim {
     // Construct the starting state. Some stuff might've been passed
     // in as a parameter...
     this.keyboard = new Keyboard(this.app.view);
-    this.state = new AppState(slideData);
+    this.state = new AppState(this, slideData);
 
     // Set up loader, but don't run it yet. I need the reference to resources.
     // Run the asset loader
@@ -123,7 +123,8 @@ class Chainsim {
     //   this.noteWindow?.resize(width, height);
     // };
     // resize();
-    globalThis.onresize = this.resizeCanvas;
+    globalThis.onresize = () => this.resizeCanvas();
+
     this.resizeCanvas();
 
     this.runLoader();
@@ -131,6 +132,7 @@ class Chainsim {
 
   private resizeCanvas(): void {
     const parent = this.app.view.parentElement;
+
     if (!parent) return;
 
     let height = parent.getBoundingClientRect().width * 1.5873015873;

@@ -60,6 +60,8 @@ export class OrderSelector extends SimContainer {
       this.puyos[i].on('pointerdown', () => {
         if (!this.orderChanging) return;
 
+        if (this.newOrder.includes(i + PUYOTYPE.RED)) return;
+
         this.newOrder.push(i + PUYOTYPE.RED);
         this.numbers[i].visible = true;
         this.numbers[i].text = `${this.newOrder.length}`;
@@ -94,8 +96,14 @@ export class OrderSelector extends SimContainer {
   }
 
   public dispatchNewOrder(): void {
-    for (let i = 0; i < this.newOrder.length; i++) {
-      this.simState.colorOrder[i] = this.newOrder[i];
-    }
+    // for (let i = 0; i < this.newOrder.length; i++) {
+    //   this.simState.colorOrder[i] = this.newOrder[i];
+    // }
+
+    this.simState.mapNewColorOrder(this.newOrder);
+    this.chainsim.activePair?.refreshSprites();
+    this.chainsim.nextWindow?.colorSet.refreshSprites();
+    this.chainsim.nextWindow?.drawer.refreshSprites();
+    this.chainsim.nextWindow?.window.nextPuyos.refreshSprites();
   }
 }

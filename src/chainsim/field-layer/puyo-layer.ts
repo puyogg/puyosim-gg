@@ -173,6 +173,25 @@ class PuyoLayer extends Layer {
     }
   }
 
+  public mapNewColorOrder(map: Map<PUYOTYPE, PUYOTYPE>): void {
+    for (let i = 0; i < this.tempField.data.length; i++) {
+      if (!isColored(this.tempField.data[i]) && this.tempField.data[i] !== PUYOTYPE.GARBAGE) {
+        // This cell is probably blank, hard, stone, or block. Skip
+        continue;
+      }
+
+      const newColor = map.get(this.tempField.data[i]);
+      if (!newColor) {
+        console.error('There was a problem remapping the tempField for the Puyo Layer');
+        return;
+      }
+
+      this.tempField.data[i] = newColor;
+    }
+
+    this.refreshSprites(this.tempField);
+  }
+
   /**
    * Calculate how far the Puyos need to drop, in pixels.
    * The calculation is based off of dropDists from the solver (not the one in this class).

@@ -115,7 +115,6 @@ export class ColorsPage extends OptionPage {
 
     // This'll cause a lot of garbage collection but oh well...
     // Make a new PIXI ColorMatrix filter
-    console.log(h, s, b);
     const newFilter = makeHSBFilter(h, s, b) as FixedFilter;
     const { matrix: newMatrix } = newFilter;
 

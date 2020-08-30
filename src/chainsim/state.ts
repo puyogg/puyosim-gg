@@ -5,6 +5,8 @@ import { TsuRNG } from './rng';
 import { ASSET_PATH } from './constants';
 import { parseCharID, parseSkinID, makeHSBFilter } from './helper/aesthetic';
 import localforage from 'localforage';
+import { Chainsim } from '.';
+import { isColored } from '../solver/helper';
 
 export interface SimulatorSettings {
   rows: number;
@@ -84,6 +86,9 @@ export function isPuyoArray(array: PUYOTYPE[] | FieldData[]): array is PUYOTYPE[
 }
 
 export class AppState {
+  // Chainsim
+  public chainsim: Chainsim;
+
   // Puyo Randomization
   public seed: number; // 32-bit unsigned integer
   public pool: number[];
@@ -118,7 +123,9 @@ export class AppState {
   // customization
   public aesthetic: Aesthetic;
 
-  constructor(x?: LoadableSlideData) {
+  constructor(chainsim: Chainsim, x?: LoadableSlideData) {
+    this.chainsim = chainsim;
+
     this.mode = 'editor'; // Need to include option to load straight into game mode.
     this.replay = false; // If true, don't override the next slides when the sim steps.
 
@@ -269,6 +276,67 @@ export class AppState {
 
   public get latestFields(): FieldData {
     return this.slides[this.slides.length - 1];
+  }
+
+  public mapNewColorOrder(newOrder: number[]): void {
+    // Make a lookup table
+    const map = new Map<PUYOTYPE, PUYOTYPE>();
+    for (let i = 0; i < newOrder.length; i++) {
+      map.set(this.colorOrder[i], newOrder[i]);
+    }
+
+    // Go through the pool and remap the order
+    for (let i = 0; i < this.pool.length; i++) {
+      const newColor = map.get(this.pool[i]);
+      if (!newColor) {
+        console.error('There was an error updating the new color order.');
+        continue;
+      }
+
+      this.pool[i] = newColor;
+    }
+
+    // Go through every slide and remap the puyo and shadow layers
+    this.slides.forEach((slide) => {
+      for (let i = 0; i < slide.puyo.data.length; i++) {
+        if (!isColored(slide.puyo.data[i]) && slide.puyo.data[i] !== PUYOTYPE.GARBAGE) {
+          // This cell is probably blank, hard, stone, or block. Skip
+          continue;
+        }
+
+        const newPuyoColor = map.get(slide.puyo.data[i]);
+        if (!newPuyoColor) {
+          console.error('There was an error remapping the fields to a new color order.');
+          continue;
+        }
+
+        slide.puyo.data[i] = newPuyoColor;
+      }
+
+      for (let i = 0; i < slide.shadow.data.length; i++) {
+        if (!isColored(slide.shadow.data[i]) && slide.shadow.data[i] !== PUYOTYPE.GARBAGE) {
+          // This cell is probably blank, hard, stone, or block. Skip
+          continue;
+        }
+
+        const newShadowColor = map.get(slide.shadow.data[i]);
+        if (!newShadowColor || (!isColored(newShadowColor) && newShadowColor !== PUYOTYPE.GARBAGE)) {
+          console.error('There was an error remapping the fields to a new color order.');
+          continue;
+        }
+
+        slide.shadow.data[i] = newShadowColor;
+      }
+    });
+
+    // Update color orders for Puyo and Shadow layers
+    this.chainsim.frame?.puyoLayer.mapNewColorOrder(map);
+
+    // Overwrite the old color order
+    for (let i = 0; i < this.colorOrder.length; i++) {
+      this.colorOrder[i] = newOrder[i];
+    }
+    console.log(this.pool);
   }
 
   public async loadLocalSettings(): Promise<void> {
