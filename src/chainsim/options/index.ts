@@ -128,7 +128,10 @@ export class OptionsMenu extends SimContainer {
     this.exit = new Sprite(this.toolTextures['editor_x.png']);
     this.exit.position.set(560, 940);
     this.exit.anchor.set(0.5);
-    this.exit.on('pointerdown', () => (this.visible = false));
+    this.exit.on('pointerdown', async () => {
+      await this.simState.saveCustomization();
+      this.visible = false;
+    });
     this.exit.interactive = true;
     this.exit.buttonMode = true;
     this.addChild(this.exit);

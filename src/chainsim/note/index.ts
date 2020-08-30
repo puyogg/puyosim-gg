@@ -35,7 +35,7 @@ export class NoteWindow extends SimContainer {
       alignItems: 'center',
       padding: '5% 0 5% 0',
       pointerEvents: 'none',
-      // visibility: 'hidden',
+      visibility: 'hidden',
     };
     Object.assign(this.fullDiv.style, fullDivStyle);
     this.gameContainer.appendChild(this.fullDiv);
@@ -92,6 +92,11 @@ export class NoteWindow extends SimContainer {
 
   public update(): void {
     //
+  }
+
+  public setVisible(bool: boolean): void {
+    this.visible = bool;
+    this.fullDiv.style.visibility = bool ? 'visible' : 'hidden';
   }
 
   public resize(width: number, height: number): void {

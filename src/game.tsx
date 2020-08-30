@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { ChainSolver } from './solver';
 import { DEFAULT_SETTINGS } from './solver/constants';
 
-import { Chainsim } from './chainsim';
+import { Chainsim, createChainsim } from './chainsim';
 
 const chain = [
   3,
@@ -92,18 +92,22 @@ const Game: React.FunctionComponent = () => {
   const gameDiv = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const chainsim = new Chainsim(
-      {
-        width: 630,
-        height: 1000,
-        transparent: true,
-        antialias: true,
-        preserveDrawingBuffer: true,
-      },
-      chain,
-    );
+    const setupChainsim = async () => {
+      const chainsim = await createChainsim(
+        {
+          width: 630,
+          height: 1000,
+          transparent: true,
+          antialias: true,
+          preserveDrawingBuffer: true,
+        },
+        chain,
+      );
 
-    chainsim.mountGame(gameDiv.current as HTMLElement);
+      chainsim.mountGame(gameDiv.current as HTMLElement);
+    };
+
+    setupChainsim();
   }, []);
   // const solver = new ChainSolver(chain, DEFAULT_SETTINGS);
   // solver.simulate();

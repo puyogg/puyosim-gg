@@ -16,6 +16,7 @@ import { NoteWindow } from './note';
 import { OptionsMenu } from './options';
 import { Keyboard } from './keyboard';
 import puyoJSON from './helper/puyo.json';
+import { loadCustomization, StoredCustomization } from './helper/storage';
 
 /** Subset of options available at https://pixijs.download/v5.3.3/docs/PIXI.Application.html */
 interface PixiOptions {
@@ -34,7 +35,7 @@ interface PixiOptions {
  * - Coordinates the different components.
  * - Provides methods for mounting the game to an HTMLElement.
  */
-class Chainsim {
+export class Chainsim {
   public app: PIXI.Application;
   public root: PIXI.Container; // Gets blurred when the options menu appears.
   public loader: PIXI.Loader;
@@ -69,7 +70,7 @@ class Chainsim {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public animationState: (delta: number, ...args: any[]) => void;
 
-  constructor(options: PixiOptions, slideData?: LoadableSlideData) {
+  constructor(options: PixiOptions, customization?: StoredCustomization, slideData?: LoadableSlideData) {
     this.simLoaded = false;
     this.app = new PIXI.Application(options);
 
@@ -79,7 +80,7 @@ class Chainsim {
     // Construct the starting state. Some stuff might've been passed
     // in as a parameter...
     this.keyboard = new Keyboard(this.app.view);
-    this.state = new AppState(this, slideData);
+    this.state = new AppState(this, customization, slideData);
 
     // Set up loader, but don't run it yet. I need the reference to resources.
     // Run the asset loader
@@ -98,31 +99,6 @@ class Chainsim {
     // Set tabindex=0 to allow for focusable keyboard inputs
     this.app.renderer.view.tabIndex = 0;
 
-    // Handle window resize.
-    // const resize = () => {
-    //   const parent = this.app.view.parentElement;
-    //   if (!parent) return;
-
-    //   let height = parent.getBoundingClientRect().width * 1.5873015873;
-    //   let width = parent.getBoundingClientRect().width;
-    //   this.app.view.style.height = `${height}px`;
-    //   this.app.view.style.width = `${width}px`;
-
-    //   // !!! Check if we have the note window open
-    //   // But if the game is taller than the window, resize it again
-    //   // let gameHeight = parseFloat(this.app.view.style.height.replace(/[^\d.-]/g, ''));
-    //   if (!this.noteWindow?.visible) {
-    //     if (height > window.innerHeight) {
-    //       height = window.innerHeight;
-    //       width = window.innerHeight * 0.63;
-    //       this.app.view.style.height = `${height}px`;
-    //       this.app.view.style.width = `${width}px`;
-    //     }
-    //   }
-
-    //   this.noteWindow?.resize(width, height);
-    // };
-    // resize();
     globalThis.onresize = () => this.resizeCanvas();
 
     this.resizeCanvas();
@@ -157,7 +133,7 @@ class Chainsim {
 
   private async runLoader(): Promise<void> {
     // Overwrite the sim state with any saved data from IndexedDB.
-    await this.state.loadLocalSettings();
+    // await this.state.loadCustomization();
 
     // Replace the loaded puyo skin with the one in the state obj.
     puyoJSON.meta.image = this.state.aesthetic.skin;
@@ -254,11 +230,12 @@ class Chainsim {
     this.app.ticker.add(() => this.slideChanger?.update());
     this.root.addChild(this.slideChanger);
 
-    // // Note Window ////
-    // this.noteWindow = new NoteWindow(this);
-    // this.noteWindow.position.set(0, 0);
-    // this.app.ticker.add(() => this.noteWindow?.update());
-    // this.root.addChild(this.noteWindow);
+    // Note Window ////
+    this.noteWindow = new NoteWindow(this);
+    this.noteWindow.position.set(0, 0);
+    this.noteWindow.setVisible(false);
+    this.app.ticker.add(() => this.noteWindow?.update());
+    this.root.addChild(this.noteWindow);
 
     this.optionsMenu = new OptionsMenu(this);
     this.app.stage.addChild(this.optionsMenu);
@@ -488,10 +465,9 @@ class Chainsim {
   }
 }
 
-class ChainsimFull extends Chainsim {
-  constructor(options: PixiOptions) {
-    super(options);
-  }
-}
+export async function createChainsim(options: PixiOptions, slideData?: LoadableSlideData): Promise<Chainsim> {
+  const customization = await loadCustomization();
+  console.log('Loaded customization:', customization);
 
-export { Chainsim, ChainsimFull };
+  return new Chainsim(options, customization, slideData);
+}

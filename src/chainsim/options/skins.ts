@@ -5,6 +5,7 @@ import { Chainsim } from '../';
 import skinList from '../skin-names.json';
 import { OptionsMenu } from '.';
 import { OptionPage } from './page';
+import { parseSkinID } from '../helper/aesthetic';
 
 /** The field frame. Contains the borders, background, and field layers.*/
 export class SkinPage extends OptionPage {
@@ -202,6 +203,9 @@ export class SkinPage extends OptionPage {
         this.chainsim.optionsMenu?.simulatorPage.refreshSprites();
 
         this.optionsMenu.isLoading = false;
+
+        this.simState.aesthetic.skinID = idx;
+        this.simState.aesthetic.skin = `${ASSET_PATH}/puyo/${parseSkinID(idx)}`;
       });
   }
 }

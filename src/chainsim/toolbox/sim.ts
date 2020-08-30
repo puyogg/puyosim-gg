@@ -20,7 +20,7 @@ class SimTools extends SimContainer {
       // console.log(this.simState.slides[this.simState.slidePos]);
       const noteWindow = this.chainsim.noteWindow;
       if (noteWindow) {
-        noteWindow.visible = true;
+        noteWindow.setVisible(true);
       }
     });
     this.addChild(this.btnNote);
