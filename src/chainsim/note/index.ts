@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { Sprite } from 'pixi.js';
+import { Sprite, Graphics } from 'pixi.js';
 import { SimContainer } from '../container';
 import { Chainsim } from '..';
 import { ASSET_PATH } from '../constants';
@@ -11,9 +11,16 @@ export class NoteWindow extends SimContainer {
   private canvasHeight: number;
 
   private emojiPicker: EmojiPicker;
+  private buttonRow: HTMLDivElement;
 
   private fullDiv: HTMLDivElement;
   private inputDiv: HTMLDivElement;
+  private pageLeft: HTMLImageElement;
+  private pageRight: HTMLImageElement;
+  private pageNum: number;
+  private pageNumDisplay: HTMLSpanElement;
+  private changePosition: HTMLDivElement;
+  private exitNotes: HTMLDivElement;
 
   constructor(chainsim: Chainsim) {
     super(chainsim);
@@ -55,6 +62,7 @@ export class NoteWindow extends SimContainer {
       boxSizing: 'border-box',
       outline: '0px solid transparent',
       pointerEvents: 'auto',
+      filter: 'drop-shadow(0 0 1em black)',
     };
     Object.assign(this.inputDiv.style, divStyle);
     this.inputDiv.addEventListener('paste', (e) => {
@@ -69,25 +77,46 @@ export class NoteWindow extends SimContainer {
     this.fullDiv.appendChild(this.inputDiv);
     console.log(this.gameContainer);
 
-    // Try to render a sprite and extract it.
-    const sprite = new Sprite(this.puyoTextures['red_0.png']);
-    const filter = new PIXI.filters.ColorMatrixFilter();
-    filter.contrast(0.9, true);
-    sprite.filters = [filter];
-    const image: HTMLImageElement = this.chainsim.app.renderer.plugins.extract.image(sprite);
-    image.style.width = `8%`;
-    image.style.verticalAlign = 'middle';
-    image.className = 'red';
-    this.inputDiv.appendChild(image);
-    this.addChild(sprite);
-
     // Emoji Picker
     this.emojiPicker = new EmojiPicker(chainsim);
+    this.emojiPicker.div.style.filter = 'drop-shadow(0 0 1em black)';
     this.fullDiv.appendChild(this.emojiPicker.div);
 
-    setInterval(() => {
-      console.log(this.getNoteFromDOM(this.inputDiv.innerHTML));
-    }, 1000);
+    // Cancel and slide reverse
+    this.buttonRow = document.createElement('div');
+    const buttonRowStyle: Partial<CSSStyleDeclaration> = {
+      position: `relative`,
+      fontFamily: `"Lucida Grande", sans-serif`,
+      fontSize: `${this.canvasWidth / 20}px`,
+      boxSizing: 'border-box',
+      outline: '0px solid transparent',
+      pointerEvents: 'auto',
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      // filter: 'drop-shadow(0 0 1em black)',
+    };
+    Object.assign(this.buttonRow.style, buttonRowStyle);
+    this.fullDiv.appendChild(this.buttonRow);
+
+    //
+    const extractor: PIXI.Extract = this.chainsim.app.renderer.plugins.extract;
+    const pageDiv = document.createElement('div');
+    pageDiv.style.display = 'flex';
+    pageDiv.style.flexDirection = 'row';
+    pageDiv.style.alignItems = 'center';
+    const pageLeftSprite = new Sprite(this.toolTextures['picker_arrow_left.png']);
+    const pageRightSprite = new Sprite(this.toolTextures['picker_arrow_right.png']);
+    this.pageLeft = extractor.image(pageLeftSprite);
+    this.pageLeft.style.width = '25%';
+    this.pageRight = extractor.image(pageRightSprite);
+    this.pageNum = 0;
+    this.pageNumDisplay = document.createElement('span');
+    this.pageNumDisplay.innerText = `${this.pageNum + 1} / 4`;
+    pageDiv.appendChild(this.pageLeft);
+    pageDiv.appendChild(this.pageNumDisplay);
+    pageDiv.appendChild(this.pageRight);
+    this.buttonRow.appendChild(pageDiv);
   }
 
   public update(): void {
