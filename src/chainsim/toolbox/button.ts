@@ -14,15 +14,23 @@ export class Button extends Sprite {
     this.buttonMode = true;
 
     this.addListener('pointerup', () => {
-      this.texture = this.upTexture;
+      this.down = false;
     });
 
     this.addListener('pointerupoutside', () => {
-      this.texture = this.upTexture;
+      this.down = false;
     });
 
     this.addListener('pointerdown', () => {
-      this.texture = this.dnTexture;
+      this.down = true;
     });
+  }
+
+  set down(bool: boolean) {
+    this.texture = bool ? this.dnTexture : this.upTexture;
+  }
+
+  get down(): boolean {
+    return this.texture === this.dnTexture;
   }
 }

@@ -176,26 +176,22 @@ export class Chainsim {
     this.frame.x = 0;
     this.frame.y = 132;
     this.root.addChild(this.frame);
-    this.app.ticker.add((delta: number) => this.frame?.update(delta));
 
     this.scoreDisplay = new ScoreDisplay(this, this.frame.puyoLayer);
     this.scoreDisplay.x = 32;
     this.scoreDisplay.y = 935;
     this.root.addChild(this.scoreDisplay);
-    this.app.ticker.add(() => this.scoreDisplay?.update());
 
     this.garbageTray = new GarbageTray(this, this.frame.puyoLayer);
     this.garbageTray.x = 337;
     this.garbageTray.y = 915;
     this.garbageTray.scale.set(0.7, 0.7);
     this.root.addChild(this.garbageTray);
-    this.app.ticker.add((delta: number) => this.garbageTray?.update(delta));
 
     //// ACTIVE PAIR ////
     this.activePair = new ActivePairContainer(this);
     this.activePair.x = this.frame.puyoLayer.toGlobal(this.root).x;
     this.activePair.y = this.frame.puyoLayer.toGlobal(this.root).y - 60 * 2;
-    this.app.ticker.add((delta: number) => this.activePair?.update(delta));
     this.root.addChild(this.activePair);
 
     //// TOOLBOX ////
@@ -208,13 +204,10 @@ export class Chainsim {
     this.chainCounter.x = 432;
     this.chainCounter.y = 836;
     this.root.addChild(this.chainCounter);
-    this.app.ticker.add((delta: number) => this.chainCounter?.update(delta));
 
     //// NEXT WINDOW ////
     this.nextWindow = new NextWindow(this);
     this.nextWindow.position.set(456, 160);
-    // this.nextWindow.position.set(200, 200);
-    this.app.ticker.add((delta: number) => this.nextWindow?.update(delta));
     this.root.addChild(this.nextWindow);
 
     //// OPTIONS ////
@@ -227,19 +220,30 @@ export class Chainsim {
     this.slideChanger = new SlideChanger(this);
     this.slideChanger.position.set(530, 135);
     this.slideChanger.scale.set(0.76);
-    this.app.ticker.add(() => this.slideChanger?.update());
     this.root.addChild(this.slideChanger);
 
     // Note Window ////
     this.noteWindow = new NoteWindow(this);
     this.noteWindow.position.set(0, 0);
     this.noteWindow.setVisible(false);
-    this.app.ticker.add(() => this.noteWindow?.update());
     this.root.addChild(this.noteWindow);
 
     this.optionsMenu = new OptionsMenu(this);
     this.app.stage.addChild(this.optionsMenu);
-    this.app.ticker.add(() => this.optionsMenu?.update());
+
+    // Add a bunch of things to the ticker
+    this.app.ticker.add((delta: number) => {
+      this.frame?.update(delta);
+      this.scoreDisplay?.update();
+      this.garbageTray?.update(delta);
+      this.toolbox?.update();
+      this.activePair?.update(delta);
+      this.chainCounter?.update(delta);
+      this.nextWindow?.update(delta);
+      this.slideChanger?.update();
+      this.noteWindow?.update();
+      this.optionsMenu?.update();
+    });
 
     // Now that everything's been placed, resize the canvas.
     this.resizeCanvas();

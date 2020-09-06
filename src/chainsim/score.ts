@@ -33,7 +33,7 @@ class ScoreDisplay extends SimContainer {
   public update(): void {
     const showScoreUpdate = this.score !== this.simState.solver.states[this.simState.solverStep].score;
 
-    if (this.chainsim.animationState === this.chainsim.idle) {
+    if (this.chainsim.animationState === this.chainsim.idle && this.simState.mode === 'editor') {
       this.score = 0;
       this.showScore();
     }

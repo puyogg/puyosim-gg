@@ -63,19 +63,20 @@ class ChainCounter extends SimContainer {
   public update(delta: number): void {
     const showNumberUpdate = this.chain !== this.simState.solver.states[this.simState.solverStep].chainLength;
     const puyoLayerBursting = this.puyoLayer.runningBurstAnimation;
-    const correctState = this.chainsim.animationState === this.chainsim.animatePops;
+    const isPopping = this.chainsim.animationState === this.chainsim.animatePops;
     const popSkipped =
       this.prevState === this.chainsim.animatePops && this.chainsim.animationState === this.chainsim.chainPaused;
     const wentBack = this.solverPos > this.simState.solverStep;
 
     // console.log(this.simState.solver.states[this.simState.solverStep].chainLength);
-    if ((puyoLayerBursting && correctState && showNumberUpdate) || (showNumberUpdate && popSkipped) || wentBack) {
+    if ((puyoLayerBursting && isPopping && showNumberUpdate) || (showNumberUpdate && popSkipped) || wentBack) {
       this.solverPos = this.simState.solverStep;
       this.chain = this.simState.solver.states[this.simState.solverStep].chainLength;
       this.prepAnimation();
     } else if (
-      this.simState.solver.states[this.simState.solverStep].chainLength === 0 ||
-      this.chainsim.animationState === this.chainsim.idle
+      (this.simState.solver.states[this.simState.solverStep].chainLength === 0 ||
+        this.chainsim.animationState === this.chainsim.idle) &&
+      this.simState.mode === 'editor'
     ) {
       this.firstDigit.visible = false;
       this.secondDigit.visible = false;

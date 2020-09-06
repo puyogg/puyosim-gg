@@ -23,4 +23,8 @@ export class Toolbox extends SimContainer {
     this.gameTools.visible = false;
     this.addChild(this.gameTools);
   }
+
+  public update(): void {
+    this.gameTools.update();
+  }
 }

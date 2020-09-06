@@ -33,6 +33,8 @@ export interface FieldData {
 export interface PuyoMovement {
   softDropSpeed: number; // Used for soft dropping and for gravity after chaining event.
   dropSpeedDuringChain: number; // Drop speed used on Puyos after a chaining event
+  delayAutoShift: number;
+  autoRepeatRate: number;
 }
 
 export interface Aesthetic {
@@ -257,6 +259,8 @@ export class AppState {
     this.puyoMovement = {
       softDropSpeed: this.pxSizing.cellHeight / 2,
       dropSpeedDuringChain: this.pxSizing.cellHeight / 2,
+      delayAutoShift: customization?.gameSettings.delayAutoShift || 16,
+      autoRepeatRate: customization?.gameSettings.autoRepeatRate || 2,
     };
   }
 

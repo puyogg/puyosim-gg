@@ -13,6 +13,9 @@ export class Keyboard {
   public redo: Key;
   public reset: Key;
 
+  private btnList: Key[];
+  public active: boolean;
+
   public changingBinds: boolean;
   public bindTarget: Key | undefined;
 
@@ -57,6 +60,9 @@ export class Keyboard {
       code: 'KeyR',
       isDown: false,
     };
+
+    this.btnList = [this.left, this.right, this.down, this.rotL, this.rotR, this.undo, this.redo, this.reset];
+    this.active = false;
 
     this.changingBinds = false;
     this.bindTarget = undefined;
@@ -106,6 +112,10 @@ export class Keyboard {
         break;
     }
 
+    if (this.btnList.some((btn) => btn.isDown)) {
+      this.active = true;
+    }
+
     // Consume the event so it doesn't get handled twice.
     event.preventDefault();
   }
@@ -144,6 +154,10 @@ export class Keyboard {
         break;
       default:
         break;
+    }
+
+    if (this.btnList.every((btn) => !btn.isDown)) {
+      this.active = false;
     }
 
     // Consume the event so it doesn't get handled twice.
